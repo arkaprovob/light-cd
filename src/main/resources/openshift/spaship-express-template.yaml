@@ -1,0 +1,31 @@
+kind: "Template"
+apiVersion: "v1"
+metadata:
+  name: "deployment-template"
+labels:
+  template: "deployment-template"
+parameters:
+  - name: "ENV"
+    description: "Environment of the website"
+    required: true
+  - name: "WEBSITE"
+    description: "Name of website"
+    required: true
+  - name: "WEBSITE_VERSION"
+    description: "Version of website"
+    required: true
+  - name: "TRACE_ID"
+    description: "tracing UUID from operator during creation"
+    required: true
+  - name: "IMAGE_HTTPD"
+    value: "quay.io/spaship/httpd"
+    required: false
+  - name: "IMAGE_API"
+    value: "quay.io/spaship/content-git-api"
+    required: false
+  - name: "IMAGE_HTTPD_VERSION"
+    value: "1.3.6"
+    required: false
+  - name: "IMAGE_API_VERSION"
+    value: "1.3.6"
+    required: false
