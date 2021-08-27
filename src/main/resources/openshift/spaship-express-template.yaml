@@ -5,27 +5,313 @@ metadata:
 labels:
   template: "deployment-template"
 parameters:
-  - name: "ENV"
-    description: "Environment of the website"
+  - name: "TAG"
+    description: "tag of the deployment"
+    value: develop
     required: true
-  - name: "WEBSITE"
-    description: "Name of website"
+  - name: "STORAGE_CLASS"
+    description: "volume of the deployment"
+    value: "gp2"
+    required: false
+  - name: "REPLICAS"
+    description: "no of replica in mongodb"
+    value: "1"
     required: true
-  - name: "WEBSITE_VERSION"
-    description: "Version of website"
-    required: true
-  - name: "TRACE_ID"
-    description: "tracing UUID from operator during creation"
-    required: true
-  - name: "IMAGE_HTTPD"
-    value: "quay.io/spaship/httpd"
+  - name: "MONGO_REPOSITORY"
+    description: "mongodb container repository"
+    value: "quay.io/arbhatta/mongo:4.2.8"
     required: false
-  - name: "IMAGE_API"
-    value: "quay.io/spaship/content-git-api"
+  - name: "MANAGER_REPOSITORY"
+    description: "SPAship manager repository"
+    value: "quay.io/spaship/spaship-manager"
     required: false
-  - name: "IMAGE_HTTPD_VERSION"
-    value: "1.3.6"
+  - name: "UI_REPOSITORY"
+    description: "SPAship UI repository"
+    value: "quay.io/spaship/spaship-ui"
     required: false
-  - name: "IMAGE_API_VERSION"
-    value: "1.3.6"
-    required: false
+objects:
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: mongo
+      labels:
+        app.kubernetes.io/name: mongo
+        app.kubernetes.io/instance: mongo
+        app.kubernetes.io/managed-by: spaship
+    spec:
+      ports:
+        - protocol: TCP
+          port: 27017
+          targetPort: 27017
+      clusterIP: None
+      selector:
+        app: mongo
+  - kind: StatefulSet
+    apiVersion: apps/v1
+    metadata:
+      name: mongo
+      labels:
+        app: mongo
+    spec:
+      replicas: ${REPLICAS}
+      selector:
+        matchLabels:
+          app: mongo
+      serviceName: mongo
+      template:
+        metadata:
+          labels:
+            app: mongo
+        spec:
+          terminationGracePeriodSeconds: 30
+          imagePullSecrets:
+            - name: regcred
+          containers:
+            - name: mongo
+              image: "${MONGO_REPOSITORY}"
+              imagePullPolicy: IfNotPresent
+              command:
+                - mongod
+                - "--bind_ip_all"
+                - "--replSet"
+                - rs0
+              ports:
+                - name: mongo-port
+                  containerPort: 27017
+                  protocol: TCP
+              livenessProbe:
+                tcpSocket:
+                  port: mongo-port
+                initialDelaySeconds: 5
+                periodSeconds: 10
+              readinessProbe:
+                tcpSocket:
+                  port: mongo-port
+                initialDelaySeconds: 15
+                periodSeconds: 20
+              volumeMounts:
+                - name: mongo-volume
+                  mountPath: /data/db
+            - name: mongo-sidecar
+              image: cvallance/mongo-k8s-sidecar
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: MONGO_SIDECAR_POD_LABELS
+                  value: "app=mongo"
+      volumeClaimTemplates:
+        - metadata:
+            name: mongo-volume
+          spec:
+            accessModes: [ "ReadWriteOnce" ]
+            storageClassName: "${STORAGE_CLASS}"
+            resources:
+              requests:
+                storage: 2Gi
+  - kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: spaship-manager-config
+      labels:
+        app.kubernetes.io/name: spaship-manager
+        app.kubernetes.io/instance: spaship-manager
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    data:
+      DB_CON: mongo-0.mongo:27017
+  - kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: spaship-ui-config
+      labels:
+        app.kubernetes.io/name: spaship-ui
+        app.kubernetes.io/instance: spaship-ui
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    data:
+      BASE_URL: http://spaship-manager.dev.com
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: spaship-manager-service
+      labels:
+        app.kubernetes.io/name: spaship-manager
+        app.kubernetes.io/instance: spaship-manager
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    spec:
+      type: ClusterIP
+      clusterIP: None
+      ports:
+        - port: 3000
+          targetPort: http
+          protocol: TCP
+          name: http
+      selector:
+        app.kubernetes.io/name: spaship-manager
+        app.kubernetes.io/instance: spaship-manager
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: spaship-ui-service
+      labels:
+        app.kubernetes.io/name: spaship-ui
+        app.kubernetes.io/instance: spaship-ui
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    spec:
+      type: ClusterIP
+      clusterIP: None
+      ports:
+        - port: 2468
+          targetPort: http
+          protocol: TCP
+          name: http
+      selector:
+        app.kubernetes.io/name: spaship-ui
+        app.kubernetes.io/instance: spaship-ui
+  - kind: Deployment
+    apiVersion: apps/v1
+    metadata:
+      name: spaship-manager
+      labels:
+        app.kubernetes.io/name: spaship-manager
+        app.kubernetes.io/instance: spaship-manager
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    spec:
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: spaship-manager
+          app.kubernetes.io/instance: spaship-manager
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: spaship-manager
+            app.kubernetes.io/instance: spaship-manager
+        spec:
+          containers:
+            - name: spaship-manager
+              image: "${MANAGER_REPOSITORY}:${TAG}"
+              envFrom:
+                - configMapRef:
+                    name: spaship-manager-config
+              imagePullPolicy: Always
+              ports:
+                - name: http
+                  containerPort: 3000
+                  protocol: TCP
+              livenessProbe:
+                tcpSocket:
+                  port: http
+                initialDelaySeconds: 30
+                periodSeconds: 10
+              readinessProbe:
+                tcpSocket:
+                  port: http
+                initialDelaySeconds: 30
+                periodSeconds: 10
+              resources:
+                limits:
+                  cpu: 600m
+                  memory: 512Mi
+                requests:
+                  cpu: 300m
+                  memory: 256Mi
+  - kind: HorizontalPodAutoscaler
+    apiVersion: autoscaling/v2beta1
+    metadata:
+      name: spaship-manager
+      labels:
+        app.kubernetes.io/name: spaship-manager
+        app.kubernetes.io/instance: spaship-manager
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    spec:
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: spaship-manager
+      minReplicas: 1
+      maxReplicas: 2
+      metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            targetAverageUtilization: 80
+        - type: Resource
+          resource:
+            name: memory
+            targetAverageUtilization: 80
+  - kind: Deployment
+    apiVersion: apps/v1
+    metadata:
+      name: spaship-ui
+      labels:
+        app.kubernetes.io/name: spaship-ui
+        app.kubernetes.io/instance: spaship-ui
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    spec:
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: spaship-ui
+          app.kubernetes.io/instance: spaship-ui
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: spaship-ui
+            app.kubernetes.io/instance: spaship-ui
+        spec:
+          containers:
+            - name: spaship-ui
+              image: "${UI_REPOSITORY}:${TAG}"
+              envFrom:
+                - configMapRef:
+                    name: spaship-ui-config
+              imagePullPolicy: Always
+              ports:
+                - name: http
+                  containerPort: 2468
+                  protocol: TCP
+              livenessProbe:
+                tcpSocket:
+                  port: http
+                initialDelaySeconds: 30
+                periodSeconds: 10
+              readinessProbe:
+                tcpSocket:
+                  port: http
+                initialDelaySeconds: 30
+                periodSeconds: 10
+              resources:
+                limits:
+                  cpu: 600m
+                  memory: 512Mi
+                requests:
+                  cpu: 300m
+                  memory: 256Mi
+  - kind: HorizontalPodAutoscaler
+    apiVersion: autoscaling/v2beta1
+    metadata:
+      name: spaship-ui
+      labels:
+        app.kubernetes.io/name: spaship-ui
+        app.kubernetes.io/instance: spaship-ui
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    spec:
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: spaship-ui
+      minReplicas: 1
+      maxReplicas: 2
+      metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            targetAverageUtilization: 80
+        - type: Resource
+          resource:
+            name: memory
+            targetAverageUtilization: 80

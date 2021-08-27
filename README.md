@@ -1,4 +1,4 @@
-# light-cd Project
+# light-cd Operator
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
