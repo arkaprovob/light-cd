@@ -24,13 +24,14 @@ public class DeploymentController {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Payload deploy(Payload payload) {
+    public String deploy(Payload payload) {
         if (!payload.tagExists(tag)){
             LOG.info("incoming event is not a part of this instance");
-            return new Payload();
+            return "skipped";
         }
-        return deploymentService.initiateDeploy(payload,nameSPace);
+        deploymentService.initiateDeploy(payload,nameSPace);
+        return "accepted";
     }
 }

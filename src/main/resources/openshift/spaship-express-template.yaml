@@ -13,10 +13,6 @@ parameters:
     description: "volume of the deployment"
     value: "gp2"
     required: false
-  - name: "REPLICAS"
-    description: "no of replica in mongodb"
-    value: "1"
-    required: true
   - name: "MONGO_REPOSITORY"
     description: "mongodb container repository"
     value: "quay.io/arbhatta/mongo:4.2.8"
@@ -53,7 +49,7 @@ objects:
       labels:
         app: mongo
     spec:
-      replicas: ${REPLICAS}
+      replicas: 1
       selector:
         matchLabels:
           app: mongo
