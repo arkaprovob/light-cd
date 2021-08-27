@@ -2,6 +2,7 @@ package org.prototype;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
+import io.fabric8.openshift.client.OpenShiftClient;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ public class Configuration {
 
     @Produces
     @Named("namespace")
-    String defaultNamespace() throws IOException {
+    String getNamespace() throws IOException {
         String computedNameSpace = Optional
                 .of(new String
                         (Files.readAllBytes(Paths.get("/var/run/secrets/kubernetes.io/serviceaccount/namespace")))
@@ -36,7 +37,7 @@ public class Configuration {
     }
 
     @Produces
-    public KubernetesClient openshiftClient() {
+    public OpenShiftClient openshiftClient() {
         return new DefaultOpenShiftClient();
     }
 

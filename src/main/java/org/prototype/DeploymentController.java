@@ -1,11 +1,9 @@
 package org.prototype;
 
 import org.eclipse.microprofile.config.ConfigProvider;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -18,10 +16,11 @@ public class DeploymentController {
 
     private final DeploymentService deploymentService;
     private final String tag;
-
+    private final String nameSPace;
     public DeploymentController(DeploymentService deploymentService) {
         this.deploymentService = deploymentService;
-        this.tag = ConfigProvider.getConfig().getValue("cd.trigger.tag", String.class);
+        this.tag = ConfigProvider.getConfig().getValue("validation.trigger.tag", String.class);
+        this.nameSPace = ConfigProvider.getConfig().getValue("application.k8s.namespace", String.class);
     }
 
     @POST
@@ -32,6 +31,6 @@ public class DeploymentController {
             LOG.info("incoming event is not a part of this instance");
             return new Payload();
         }
-        return deploymentService.initiateDeploy(payload);
+        return deploymentService.initiateDeploy(payload,nameSPace);
     }
 }
