@@ -1,6 +1,5 @@
 package org.prototype;
 
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -32,7 +31,7 @@ public class Configuration {
                 ).orElse(nameSpaceFromEnv
                         .orElse("default")
                 );
-        LOG.info("computed namespace is {}",computedNameSpace);
+        LOG.info("computed namespace is {}", computedNameSpace);
         return computedNameSpace;
     }
 

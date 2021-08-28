@@ -1,7 +1,8 @@
 package org.prototype;
 
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 
 public class Payload {
@@ -13,7 +14,6 @@ public class Payload {
     String homepage;
     @JsonProperty("updated_tags")
     List<String> updatedTags;
-
 
 
     public String getName() {
@@ -60,12 +60,12 @@ public class Payload {
         return updatedTags;
     }
 
-    public boolean tagExists(String tag) {
-        return updatedTags.contains(tag);
-    }
-
     public void setUpdatedTags(List<String> updatedTags) {
         this.updatedTags = updatedTags;
+    }
+
+    public boolean tagExists(String tag) {
+        return updatedTags.contains(tag);
     }
 
     @Override

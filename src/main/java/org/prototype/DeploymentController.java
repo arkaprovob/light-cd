@@ -17,6 +17,7 @@ public class DeploymentController {
     private final DeploymentService deploymentService;
     private final String tag;
     private final String nameSPace;
+
     public DeploymentController(DeploymentService deploymentService) {
         this.deploymentService = deploymentService;
         this.tag = ConfigProvider.getConfig().getValue("validation.trigger.tag", String.class);
@@ -27,11 +28,11 @@ public class DeploymentController {
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
     public String deploy(Payload payload) {
-        if (!payload.tagExists(tag)){
+        if (!payload.tagExists(tag)) {
             LOG.info("incoming event is not a part of this instance");
             return "skipped";
         }
-        deploymentService.initiateDeploy(payload,nameSPace);
+        deploymentService.initiateDeploy(payload, nameSPace);
         return "accepted";
     }
 }
