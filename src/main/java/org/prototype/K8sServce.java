@@ -83,14 +83,13 @@ public class K8sServce {
     }
 
 
-
     @ConsumeEvent("process.cleanup")
-    void cleanupResources(String nameSpace){
+    void cleanupResources(String nameSpace) {
 
         LOG.info("cleaning all resources from  {}", nameSpace);
 
         Uni.createFrom()
-                .item(()->{
+                .item(() -> {
                     boolean dDStatus = openShiftClient.apps().deployments().inNamespace(nameSpace).delete();
                     boolean ssDStatus = openShiftClient.apps().statefulSets().inNamespace(nameSpace).delete();
                     boolean hpaDStatus = openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers()
@@ -101,7 +100,7 @@ public class K8sServce {
                 })
                 .runSubscriptionOn(Infrastructure.getDefaultExecutor())
                 .subscribe()
-                .with(result -> LOG.info("cleanup status is {}",result));
+                .with(result -> LOG.info("cleanup status is {}", result));
 
     }
 
