@@ -14,6 +14,7 @@ public class Payload {
     String homepage;
     @JsonProperty("updated_tags")
     List<String> updatedTags;
+    String k8sNameSpace;
 
 
     public String getName() {
@@ -66,6 +67,14 @@ public class Payload {
 
     public boolean tagExists(String tag) {
         return updatedTags.contains(tag);
+    }
+
+    public String getK8sNameSpace() {
+        return k8sNameSpace;
+    }
+
+    public void setK8sNameSpace(String k8sNameSpace) {
+        this.k8sNameSpace = k8sNameSpace;
     }
 
     @Override

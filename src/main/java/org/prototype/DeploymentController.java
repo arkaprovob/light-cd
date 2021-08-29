@@ -1,27 +1,26 @@
 package org.prototype;
 
+import io.vertx.mutiny.core.eventbus.EventBus;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.inject.Named;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 @Path("/deploy")
 public class DeploymentController {
     private static final Logger LOG = LoggerFactory.getLogger(DeploymentController.class);
 
-    private final DeploymentService deploymentService;
     private final String tag;
-    private final String nameSPace;
+    private final String nameSpace;
+    private final EventBus bus;
 
-    public DeploymentController(DeploymentService deploymentService) {
-        this.deploymentService = deploymentService;
+    public DeploymentController(EventBus bus, @Named("namespace") String nameSpace) {
+        this.bus = bus;
         this.tag = ConfigProvider.getConfig().getValue("validation.trigger.tag", String.class);
-        this.nameSPace = ConfigProvider.getConfig().getValue("application.k8s.namespace", String.class);
+        this.nameSpace = nameSpace;
     }
 
     @POST
@@ -32,7 +31,17 @@ public class DeploymentController {
             LOG.info("incoming event is not a part of this instance");
             return "skipped";
         }
-        deploymentService.initiateDeploy(payload, nameSPace);
+        payload.setK8sNameSpace(nameSpace);
+        bus.send("process.deployment", payload);
         return "accepted";
     }
+
+    @DELETE
+    @Produces(MediaType.TEXT_PLAIN)
+    public String cleanupK8SNameSpace() {
+        bus.send("process.cleanup", nameSpace);
+        return "accepted";
+    }
+
+
 }

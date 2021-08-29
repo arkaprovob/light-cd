@@ -25,14 +25,30 @@ public class Configuration {
     @Produces
     @Named("namespace")
     String getNamespace() throws IOException {
-        String computedNameSpace = Optional
-                .of(new String
-                        (Files.readAllBytes(Paths.get("/var/run/secrets/kubernetes.io/serviceaccount/namespace")))
-                ).orElse(nameSpaceFromEnv
-                        .orElse("default")
-                );
+        String computedNameSpace = Optional.ofNullable(readNameFromFile()).orElse(whenNameSpaceMetaFileNotFound());
         LOG.info("computed namespace is {}", computedNameSpace);
         return computedNameSpace;
+    }
+
+    private String readNameFromFile() {
+        String ns;
+        try {
+            ns = new String(Files
+                    .readAllBytes(Paths.get("/var/run/secrets/kubernetes.io/serviceaccount/namespace")));
+        } catch (IOException e) {
+            LOG.warn("failed to read namespace from metadata {}",e.getMessage());
+            ns=null;
+        }
+        return ns;
+    }
+
+    private String whenNameSpaceMetaFileNotFound() {
+        LOG.debug("namespace file does not exists.");
+        return nameSpaceFromEnv.orElseGet(()-> {
+            LOG.debug("namespace not on environment either! proceedi");
+            return "default";
+        });
+
     }
 
     @Produces
