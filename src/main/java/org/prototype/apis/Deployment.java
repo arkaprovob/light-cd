@@ -1,7 +1,8 @@
-package org.prototype;
+package org.prototype.apis;
 
 import io.vertx.mutiny.core.eventbus.EventBus;
 import org.eclipse.microprofile.config.ConfigProvider;
+import org.prototype.type.Payload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,14 +11,14 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 @Path("/deploy")
-public class DeploymentController {
-    private static final Logger LOG = LoggerFactory.getLogger(DeploymentController.class);
+public class Deployment {
+    private static final Logger LOG = LoggerFactory.getLogger(Deployment.class);
 
     private final String tag;
     private final String nameSpace;
     private final EventBus bus;
 
-    public DeploymentController(EventBus bus, @Named("namespace") String nameSpace) {
+    public Deployment(EventBus bus, @Named("namespace") String nameSpace) {
         this.bus = bus;
         this.tag = ConfigProvider.getConfig().getValue("validation.trigger.tag", String.class);
         this.nameSpace = nameSpace;

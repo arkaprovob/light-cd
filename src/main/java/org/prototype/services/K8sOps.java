@@ -1,4 +1,4 @@
-package org.prototype;
+package org.prototype.services;
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.Service;
@@ -11,6 +11,7 @@ import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
 import io.vertx.mutiny.core.eventbus.Message;
 import org.eclipse.microprofile.config.ConfigProvider;
+import org.prototype.type.Payload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,13 +20,13 @@ import java.util.Map;
 import java.util.Objects;
 
 @ApplicationScoped
-public class K8sServce {
+public class K8sOps {
 
-    private static final Logger LOG = LoggerFactory.getLogger(K8sServce.class);
+    private static final Logger LOG = LoggerFactory.getLogger(K8sOps.class);
 
     private final OpenShiftClient openShiftClient;
 
-    public K8sServce(OpenShiftClient openShiftClient) {
+    public K8sOps(OpenShiftClient openShiftClient) {
         this.openShiftClient = openShiftClient;
     }
 
@@ -47,7 +48,7 @@ public class K8sServce {
         var success = false;
 
         LOG.info("received payload {}", payload);
-        Map<String, String> templateParameters = Map.of("TAG", payload.updatedTags.get(0),
+        Map<String, String> templateParameters = Map.of("TAG", payload.getUpdatedTags().get(0),
                 "STORAGE_CLASS", ConfigProvider.getConfig().getValue("template.storage.param.value", String.class));
 
         LOG.debug("templateParameters are as follows {}", templateParameters);
@@ -56,7 +57,7 @@ public class K8sServce {
                 = openShiftClient
                 .templates()
                 .inNamespace(namespace)
-                .load(K8sServce
+                .load(K8sOps
                         .class.getResourceAsStream("/openshift/spaship-express-template.yaml"))
                 .processLocally(templateParameters);
 

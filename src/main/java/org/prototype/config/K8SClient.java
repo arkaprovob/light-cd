@@ -1,4 +1,4 @@
-package org.prototype;
+package org.prototype.config;
 
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
@@ -15,9 +15,9 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 @Singleton
-public class Configuration {
+public class K8SClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(K8SClient.class);
 
     @ConfigProperty(name = "application.k8s.namespace")
     Optional<String> nameSpaceFromEnv;

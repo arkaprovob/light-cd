@@ -1,4 +1,4 @@
-package org.prototype;
+package org.prototype.type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
