@@ -1,0 +1,8 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: light-cd-config
+data:
+  APPLICATION_K8S_NAMESPACE: {{ .Values.app.namespace }}
+  VALIDATION_TRIGGER_TAG: {{ .Values.app.environment }}
+  TEMPLATE_STORAGE_PARAM_VALUE: {{ .Values.app.storageclass }}
