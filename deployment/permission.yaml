@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: light-cd
+  labels:
+    app.kubernetes.io/name: light-cd
+    app.kubernetes.io/instance: light-cd
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: arbhatta
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: light-cd
+  labels:
+    app.kubernetes.io/name: light-cd
+    app.kubernetes.io/instance: light-cd
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: arbhatta
+rules:
+  - apiGroups: [ "route.openshift.io" ]
+    resources: [  "routes" ]
+    verbs: [ "create", "update", "get", "watch", "list", "delete" ]
+  # When APP_OPERATOR_ROUTER_MODE=openshift this permission needs to be enabled
+  - apiGroups: [ "route.openshift.io" ]
+    resources: [ "routes/custom-host" ]
+    verbs: [ "create" ]
+  # When APP_OPERATOR_ROUTER_MODE=ingress this permission needs to be enabled
+  - apiGroups: [ "networking.k8s.io" ]
+    resources: [  "ingresses" ]
+    verbs: [ "create", "update", "get", "watch", "list", "delete" ]
+  - apiGroups: [ "" ]
+    resources: [  "configmaps", "services" ]
+    verbs: [ "create", "update", "get", "watch", "list", "delete" ]
+  - apiGroups: [ "apps" ]
+    resources: [ "deployments" ]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: light-cd
+  labels:
+    app.kubernetes.io/name: light-cd
+    app.kubernetes.io/instance: light-cd
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: arbhatta
+roleRef:
+  kind: Role
+  name: light-cd
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: light-cd

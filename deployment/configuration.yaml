@@ -1,0 +1,9 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: light-cd-config
+data:
+  APPLICATION_K8S_NAMESPACE: light-cd
+  VALIDATION_TRIGGER_TAG: develop
+  TEMPLATE_STORAGE_PARAM_VALUE: gp2
+
