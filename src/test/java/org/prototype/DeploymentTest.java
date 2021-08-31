@@ -1,6 +1,7 @@
 package org.prototype;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.vertx.core.json.JsonObject;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
@@ -12,10 +13,10 @@ public class DeploymentTest {
     @Test
     public void testHelloEndpoint() {
         given()
-                .when().get("/hello")
+                .when().get("/health")
                 .then()
                 .statusCode(200)
-                .body(is("Hello RESTEasy"));
+                .body(is(new JsonObject().put("status","up").encodePrettily()));
     }
 
 }
