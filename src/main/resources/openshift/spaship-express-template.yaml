@@ -264,7 +264,7 @@ objects:
               envFrom:
                 - configMapRef:
                     name: spaship-ui-config
-              imagePullPolicy: IfNotPresent
+              imagePullPolicy: Always
               ports:
                 - name: http
                   containerPort: 2468
