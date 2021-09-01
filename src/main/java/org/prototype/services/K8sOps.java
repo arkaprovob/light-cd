@@ -74,7 +74,7 @@ public class K8sOps {
             if (resource instanceof Deployment)
                 handleDeployment(payload, namespace, (Deployment) resource, resourceName);
             if (resource instanceof ConfigMap)
-                handleConfigMap(namespace, (ConfigMap) resource, resourceName);
+                handleConfigMap(payload,namespace, (ConfigMap) resource, resourceName);
             if (resource instanceof Service)
                 handleService(namespace, (Service) resource, resourceName);
             if (resource instanceof HorizontalPodAutoscaler)
@@ -114,7 +114,7 @@ public class K8sOps {
         if (Objects.isNull(hpaInK8s)) {
             LOG.debug("HorizontalPodAutoscaler {} doesn't exist creating new ", resourceName);
             openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers().inNamespace(namespace).createOrReplace(resource);
-            LOG.debug("HPA {} created successfully ", resourceName);
+            LOG.info("HPA {} created successfully ", resourceName);
         }
     }
 
@@ -124,17 +124,23 @@ public class K8sOps {
         if (Objects.isNull(serviceInK8s)) {
             LOG.debug("Service {} doesn't exist creating new ", resourceName);
             openShiftClient.services().inNamespace(namespace).createOrReplace(resource);
-            LOG.debug("Service {} created successfully ", resourceName);
+            LOG.info("Service {} created successfully ", resourceName);
         }
     }
 
-    private void handleConfigMap(String namespace, ConfigMap resource, String resourceName) {
+    private void handleConfigMap(Payload payload,String namespace, ConfigMap resource, String resourceName) {
         LOG.debug("dealing with the ConfigMap");
         var configMapInK8s = openShiftClient.configMaps().inNamespace(namespace).withName(resourceName).get();
         if (Objects.isNull(configMapInK8s)) {
             LOG.debug("ConfigMap {} doesn't exist creating new ", resourceName);
             openShiftClient.configMaps().inNamespace(namespace).createOrReplace(resource);
-            LOG.debug("ConfigMap {} created successfully ", resourceName);
+            LOG.info("ConfigMap {} created successfully ", resourceName);
+        }else if( resourceName.contains(payload.getName())){
+            LOG.debug("Config Map {} exists and need to update", resourceName);
+            openShiftClient.configMaps().inNamespace(namespace).withName(resourceName).delete();
+            LOG.debug("deleted Config Map {}", resourceName);
+            openShiftClient.configMaps().inNamespace(namespace).createOrReplace(resource);
+            LOG.info("re-created Config Map {}", resourceName);
         }
     }
 
@@ -144,13 +150,13 @@ public class K8sOps {
         if (Objects.isNull(deploymentInK8s)) {
             LOG.debug("Deployment {} doesn't exist creating new ", resourceName);
             openShiftClient.apps().deployments().inNamespace(namespace).createOrReplace(resource);
-            LOG.debug("Deployment {} created successfully ", resourceName);
+            LOG.info("Deployment {} created successfully ", resourceName);
         } else if (payload.getName().equalsIgnoreCase(resourceName)) {
             LOG.debug("Deployment {} exists and need to update", resourceName);
             openShiftClient.apps().deployments().inNamespace(namespace).withName(resourceName).delete();
             LOG.debug("deleted deployment {}", resourceName);
             openShiftClient.apps().deployments().inNamespace(namespace).createOrReplace(resource);
-            LOG.debug("re-created deployment {}", resourceName);
+            LOG.info("re-created deployment {}", resourceName);
         }
     }
 
@@ -160,7 +166,7 @@ public class K8sOps {
         if (Objects.isNull(statefulSetInK8s)) {
             LOG.debug("StatefulSet {} doesn't exist creating new ", resourceName);
             openShiftClient.apps().statefulSets().inNamespace(namespace).createOrReplace(resource);
-            LOG.debug("StatefulSet {} created successfully ", resourceName);
+            LOG.info("StatefulSet {} created successfully ", resourceName);
         }
     }
 }
