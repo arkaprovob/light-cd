@@ -25,6 +25,10 @@ parameters:
     description: "SPAship UI repository"
     value: "quay.io/spaship/spaship-ui"
     required: false
+  - name: "API_URL"
+    description: "api url for spaship orchestrator"
+    value: "localhost:3000"
+    required: true
 objects:
   - kind: Service
     apiVersion: v1
@@ -124,7 +128,7 @@ objects:
         app.kubernetes.io/version: 1.0.0
         app.kubernetes.io/managed-by: spaship
     data:
-      BASE_URL: http://spaship-manager.dev.com
+      REACT_APP_API_URL: ${API_URL}
   - kind: Service
     apiVersion: v1
     metadata:

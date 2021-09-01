@@ -49,7 +49,8 @@ public class K8sOps {
 
         LOG.info("received payload {}", payload);
         Map<String, String> templateParameters = Map.of("TAG", payload.getUpdatedTags().get(0),
-                "STORAGE_CLASS", ConfigProvider.getConfig().getValue("template.storage.param.value", String.class));
+                "STORAGE_CLASS", ConfigProvider.getConfig().getValue("template.storage.param.value", String.class),
+                "API_URL",ConfigProvider.getConfig().getValue("template.api.url.param.value", String.class));
 
         LOG.debug("templateParameters are as follows {}", templateParameters);
 
@@ -65,6 +66,8 @@ public class K8sOps {
         k8sResourceList.getItems().forEach(resource -> {
 
             var resourceName = resource.getMetadata().getName();
+
+            //Class.forName(resource.getKind());
 
             if (resource instanceof StatefulSet)
                 handleStatefulSet(namespace, (StatefulSet) resource, resourceName);
