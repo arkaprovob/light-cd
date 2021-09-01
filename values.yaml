@@ -85,3 +85,4 @@ app:
   namespace: light-cd
   environment: develop
   storageclass: gp2
+  apiurl: http://spaship-manager-arbhatta-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com/api/v1
