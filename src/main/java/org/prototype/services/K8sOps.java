@@ -195,10 +195,10 @@ public class K8sOps {
         var statefulSetInK8s = openShiftClient.apps().statefulSets().inNamespace(namespace).withName(resourceName).get();
         if (Objects.isNull(statefulSetInK8s)) {
             LOG.debug("StatefulSet {} doesn't exist creating new ", resourceName);
-            openShiftClient.apps().statefulSets().inNamespace(namespace).createOrReplace(resource);
+            var statefulSet = openShiftClient.apps().statefulSets().inNamespace(namespace).createOrReplace(resource);
             LOG.info("StatefulSet {} created successfully ", resourceName);
-            //openShiftClient.pods().inNamespace(namespace).withName("").exec();
-            managedResourceWatcher.initiatePodWatcher(namespace,Map.of("app","mongo"));
+            String noOfReplica = Integer.toString(statefulSet.getSpec().getReplicas()-1);
+            managedResourceWatcher.initiatePodWatcher(namespace,Map.of("app","mongo"),noOfReplica);
         }
     }
 }

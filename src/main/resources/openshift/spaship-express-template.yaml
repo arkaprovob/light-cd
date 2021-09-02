@@ -240,7 +240,7 @@ objects:
         kind: Deployment
         name: spaship-manager
       minReplicas: 1
-      maxReplicas: 2
+      maxReplicas: 1
       metrics:
         - type: Resource
           resource:
@@ -276,9 +276,9 @@ objects:
               env:
               - name: REACT_APP_API_URL
                 value: ${API_URL}
-              #envFrom:
-              #  - configMapRef:
-              #      name: spaship-ui-config
+              envFrom:
+                - configMapRef:
+                    name: spaship-ui-config
               imagePullPolicy: Always
               ports:
                 - name: http
@@ -316,7 +316,7 @@ objects:
         kind: Deployment
         name: spaship-ui
       minReplicas: 1
-      maxReplicas: 2
+      maxReplicas: 1
       metrics:
         - type: Resource
           resource:

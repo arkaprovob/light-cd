@@ -29,7 +29,10 @@ public class ManagedResourceWatcher {
         this.openShiftClient = openShiftClient;
     }
 
-    public void initiatePodWatcher(String nameSpace, Map<String,String> filter){
+    public void initiatePodWatcher(String nameSpace, Map<String,String> filter,String noOfPods){
+
+        String lastMongoPodName = "mongo-".concat(noOfPods);
+        LOG.info("lastMongoPodName {}",lastMongoPodName);
         openShiftClient.pods().inNamespace(nameSpace).withLabels(filter).watch(new Watcher<Pod>() {
             @Override
             public void eventReceived(Action action, Pod resource) {
@@ -37,7 +40,7 @@ public class ManagedResourceWatcher {
                 LOG.debug("action {} performed on pod {}",action.name(),podName);
                 var podReadyStatus = openShiftClient.pods().inNamespace(nameSpace).withName(podName).isReady();
                 LOG.debug("pod {} is-ready status {}",podName,podReadyStatus);
-                if(podName.equals("mongo-2") && podReadyStatus){
+                if(podName.equals(lastMongoPodName) && podReadyStatus){
                     LOG.debug("All mongodb cluster pods are ready");
                     try {
                         initiateMongoReplicaSet(nameSpace);
