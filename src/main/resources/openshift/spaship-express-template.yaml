@@ -53,7 +53,7 @@ objects:
       labels:
         app: mongo
     spec:
-      replicas: 1
+      replicas: 3
       selector:
         matchLabels:
           app: mongo
@@ -106,7 +106,7 @@ objects:
             storageClassName: "${STORAGE_CLASS}"
             resources:
               requests:
-                storage: 2Gi
+                storage: 1Gi
   - kind: ConfigMap
     apiVersion: v1
     metadata:
