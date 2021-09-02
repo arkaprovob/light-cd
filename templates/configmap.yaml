@@ -7,3 +7,5 @@ data:
   VALIDATION_TRIGGER_TAG: {{ .Values.app.environment }}
   TEMPLATE_STORAGE_PARAM_VALUE: {{ .Values.app.storageclass }}
   TEMPLATE_API_URL_PARAM_VALUE: {{ .Values.app.apiurl }}
+  TEMPLATE_UI_MEMORY_LIMIT: {{ .Values.app.uimemory }}
+

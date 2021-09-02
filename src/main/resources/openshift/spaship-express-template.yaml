@@ -29,6 +29,10 @@ parameters:
     description: "api url for spaship orchestrator"
     value: "localhost:3000"
     required: true
+  - name: "UI_MEMORY_LIMIT"
+    description: "memory limit for spaship ui"
+    value: "512Mi"
+    required: true
 objects:
   - kind: Service
     apiVersion: v1
@@ -46,22 +50,26 @@ objects:
       clusterIP: None
       selector:
         app: mongo
+        app.kubernetes.io/managed-by: spaship
   - kind: StatefulSet
     apiVersion: apps/v1
     metadata:
       name: mongo
       labels:
         app: mongo
+        app.kubernetes.io/managed-by: spaship
     spec:
       replicas: 3
       selector:
         matchLabels:
           app: mongo
+          app.kubernetes.io/managed-by: spaship
       serviceName: mongo
       template:
         metadata:
           labels:
             app: mongo
+            app.kubernetes.io/managed-by: spaship
         spec:
           terminationGracePeriodSeconds: 30
           imagePullSecrets:
@@ -97,7 +105,7 @@ objects:
               imagePullPolicy: IfNotPresent
               env:
                 - name: MONGO_SIDECAR_POD_LABELS
-                  value: "app=mongo"
+                  value: "app=mongo,app.kubernetes.io/managed-by=spaship"
       volumeClaimTemplates:
         - metadata:
             name: mongo-volume
@@ -265,9 +273,12 @@ objects:
           containers:
             - name: spaship-ui
               image: "${UI_REPOSITORY}:${TAG}"
-              envFrom:
-                - configMapRef:
-                    name: spaship-ui-config
+              env:
+              - name: REACT_APP_API_URL
+                value: ${API_URL}
+              #envFrom:
+              #  - configMapRef:
+              #      name: spaship-ui-config
               imagePullPolicy: Always
               ports:
                 - name: http
@@ -286,7 +297,7 @@ objects:
               resources:
                 limits:
                   cpu: 600m
-                  memory: 512Mi
+                  memory: ${UI_MEMORY_LIMIT}
                 requests:
                   cpu: 300m
                   memory: 256Mi

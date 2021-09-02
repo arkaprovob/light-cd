@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.StatefulSet;
 import io.fabric8.kubernetes.api.model.autoscaling.v2beta1.HorizontalPodAutoscaler;
+import io.fabric8.kubernetes.client.dsl.Deletable;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @ApplicationScoped
 public class K8sOps {
@@ -25,9 +27,11 @@ public class K8sOps {
     private static final Logger LOG = LoggerFactory.getLogger(K8sOps.class);
 
     private final OpenShiftClient openShiftClient;
+    private final ManagedResourceWatcher managedResourceWatcher;
 
-    public K8sOps(OpenShiftClient openShiftClient) {
+    public K8sOps(OpenShiftClient openShiftClient, ManagedResourceWatcher managedResourceWatcher) {
         this.openShiftClient = openShiftClient;
+        this.managedResourceWatcher = managedResourceWatcher;
     }
 
     @ConsumeEvent("process.deployment")
@@ -50,7 +54,8 @@ public class K8sOps {
         LOG.info("received payload {}", payload);
         Map<String, String> templateParameters = Map.of("TAG", payload.getUpdatedTags().get(0),
                 "STORAGE_CLASS", ConfigProvider.getConfig().getValue("template.storage.param.value", String.class),
-                "API_URL",ConfigProvider.getConfig().getValue("template.api.url.param.value", String.class));
+                "API_URL",ConfigProvider.getConfig().getValue("template.api.url.param.value", String.class),
+                "UI_MEMORY_LIMIT",ConfigProvider.getConfig().getValue("template.ui.memory.limit", String.class));
 
         LOG.debug("templateParameters are as follows {}", templateParameters);
 
@@ -91,15 +96,39 @@ public class K8sOps {
     void cleanupResources(String nameSpace) {
 
         LOG.info("cleaning all resources from  {}", nameSpace);
+        var labelFilter = Map.of("app.kubernetes.io/managed-by","spaship");
 
         Uni.createFrom()
                 .item(() -> {
-                    boolean dDStatus = openShiftClient.apps().deployments().inNamespace(nameSpace).delete();
-                    boolean ssDStatus = openShiftClient.apps().statefulSets().inNamespace(nameSpace).delete();
-                    boolean hpaDStatus = openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers()
-                            .inNamespace(nameSpace).delete();
-                    boolean svcDStatus = openShiftClient.services().inNamespace(nameSpace).delete();
-                    boolean cmDStatus = openShiftClient.configMaps().inNamespace(nameSpace).delete();
+                    boolean dDStatus = Optional.ofNullable(
+                            openShiftClient.apps().deployments().inNamespace(nameSpace).withLabels(labelFilter))
+                            .map(Deletable::delete)
+                            .orElse(false);
+
+                    boolean ssDStatus = Optional.ofNullable(
+                            openShiftClient.apps().statefulSets().inNamespace(nameSpace).withLabels(labelFilter))
+                            .map(Deletable::delete)
+                            .orElse(false);
+
+                    boolean hpaDStatus = Optional.ofNullable(
+                            openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers().inNamespace(nameSpace).withLabels(labelFilter))
+                            .map(Deletable::delete)
+                            .orElse(false);
+
+                    boolean svcDStatus = Optional.ofNullable(
+                            openShiftClient.services().inNamespace(nameSpace).withLabels(labelFilter))
+                            .map(Deletable::delete)
+                            .orElse(false);
+
+                    boolean cmDStatus = Optional.ofNullable(
+                            openShiftClient.configMaps().inNamespace(nameSpace).withLabels(labelFilter))
+                            .map(Deletable::delete)
+                            .orElse(false);
+
+
+
+
+
                     return (dDStatus && ssDStatus && hpaDStatus && svcDStatus && cmDStatus);
                 })
                 .runSubscriptionOn(Infrastructure.getDefaultExecutor())
@@ -156,6 +185,7 @@ public class K8sOps {
             openShiftClient.apps().deployments().inNamespace(namespace).withName(resourceName).delete();
             LOG.debug("deleted deployment {}", resourceName);
             openShiftClient.apps().deployments().inNamespace(namespace).createOrReplace(resource);
+            openShiftClient.apps().deployments().inNamespace(namespace).withName(resource.getMetadata().getName()).rolling();
             LOG.info("re-created deployment {}", resourceName);
         }
     }
@@ -167,6 +197,8 @@ public class K8sOps {
             LOG.debug("StatefulSet {} doesn't exist creating new ", resourceName);
             openShiftClient.apps().statefulSets().inNamespace(namespace).createOrReplace(resource);
             LOG.info("StatefulSet {} created successfully ", resourceName);
+            //openShiftClient.pods().inNamespace(namespace).withName("").exec();
+            managedResourceWatcher.initiatePodWatcher(namespace,Map.of("app","mongo"));
         }
     }
 }
