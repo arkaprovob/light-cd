@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class ManagedResourceWatcher {
 
 
-    private static final Logger LOG = LoggerFactory.getLogger(K8sOps.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ManagedResourceWatcher.class);
 
     private final OpenShiftClient openShiftClient;
 
