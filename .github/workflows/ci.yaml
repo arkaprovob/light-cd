@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     name: CI process of Light-CD
     env:
-      IMAGE_NAME: "light-ci"
+      IMAGE_NAME: "light-cd"
       REGISTRY_NAMESPACE: "arbhatta"
 
     steps:
