@@ -108,7 +108,7 @@ spec:
         - name: light-cd
           securityContext:
             {}
-          image: "quay.io/arbhatta/light-ci:master"
+          image: "quay.io/arbhatta/light-cd:master"
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
