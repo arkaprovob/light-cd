@@ -34,7 +34,9 @@ public class LogWatcher {
                 .inNamespace(nameSpace).withName(podName)
                 .tailingLines(tailingLines).withPrettyOutput()
                 .getLog(true))
-                .runSubscriptionOn(Infrastructure.getDefaultExecutor());
+                .runSubscriptionOn(Infrastructure.getDefaultExecutor())
+                .onFailure()
+                .recoverWithItem(Throwable::getLocalizedMessage);
 
         //.watchLog(System.out);
     }
