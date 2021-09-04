@@ -37,8 +37,11 @@ jobs:
           distribution: 'adopt'
           java-version: 11
 
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
+#      - name: Build with Maven
+#        run: mvn -B package --file pom.xml
+
+      - name: Build Naive
+        run: ./mvnw package -Pnative
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
@@ -55,7 +58,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./src/main/docker/Dockerfile.jvm
+          file: ./src/main/docker/Dockerfile.native-distroless
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             quay.io/${{ env.REGISTRY_NAMESPACE }}/${{ env.IMAGE_NAME }}:${{env.GITHUB_REF_SLUG}}
