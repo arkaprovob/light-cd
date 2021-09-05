@@ -18,19 +18,16 @@ public class LogWatcher {
     private static final Logger LOG = LoggerFactory.getLogger(LogWatcher.class);
 
     private final OpenShiftClient openShiftClient;
-
+    Map<String, String> podLabelFilter = Map.of("app.kubernetes.io/managed-by", "spaship");
 
     public LogWatcher(OpenShiftClient openShiftClient) {
         this.openShiftClient = openShiftClient;
     }
 
-    Map<String,String> podLabelFilter = Map.of("app.kubernetes.io/managed-by","spaship");
+    public Uni<String> watch(String nameSpace, String podName, int tailingLines) {
+        LOG.debug("namespace {}, podName {}, lines {}", nameSpace, podName, tailingLines);
 
-
-    public Uni<String> watch(String nameSpace, String podName, int tailingLines){
-        LOG.debug("namespace {}, podName {}, lines {}",nameSpace,podName,tailingLines);
-
-        return Uni.createFrom().item(()->openShiftClient.pods()
+        return Uni.createFrom().item(() -> openShiftClient.pods()
                 .inNamespace(nameSpace).withName(podName)
                 .tailingLines(tailingLines).withPrettyOutput()
                 .getLog(true))
@@ -42,13 +39,13 @@ public class LogWatcher {
     }
 
 
-    public Uni<List<String>> listOfPods(String nameSpace){
+    public Uni<List<String>> listOfPods(String nameSpace) {
         return Uni.createFrom().item(nameSpace)
                 .emitOn(Infrastructure.getDefaultExecutor())
                 .map(
-                        ns-> openShiftClient.pods().inNamespace(nameSpace).withLabel("app.kubernetes.io/name").list().getItems().stream()
-                        .map(pod -> pod.getMetadata().getName()).collect(Collectors.toList())
-        );
+                        ns -> openShiftClient.pods().inNamespace(nameSpace).withLabel("app.kubernetes.io/name").list().getItems().stream()
+                                .map(pod -> pod.getMetadata().getName()).collect(Collectors.toList())
+                );
 
     }
 }

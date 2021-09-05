@@ -24,7 +24,7 @@ public class K8SClient {
 
     @Produces
     @Named("namespace")
-    String getNamespace(){
+    String getNamespace() {
         String computedNameSpace = Optional.ofNullable(readNameFromFile()).orElse(whenNameSpaceMetaFileNotFound());
         LOG.info("computed namespace is {}", computedNameSpace);
         return computedNameSpace;

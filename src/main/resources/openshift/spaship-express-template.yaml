@@ -59,7 +59,7 @@ objects:
         app: mongo
         app.kubernetes.io/managed-by: spaship
     spec:
-      replicas: 3
+      replicas: 1
       selector:
         matchLabels:
           app: mongo
@@ -100,12 +100,12 @@ objects:
               volumeMounts:
                 - name: mongo-volume
                   mountPath: /data/db
-            - name: mongo-sidecar
-              image: cvallance/mongo-k8s-sidecar
-              imagePullPolicy: IfNotPresent
-              env:
-                - name: MONGO_SIDECAR_POD_LABELS
-                  value: "app=mongo,app.kubernetes.io/managed-by=spaship"
+#            - name: mongo-sidecar
+#              image: cvallance/mongo-k8s-sidecar
+#              imagePullPolicy: IfNotPresent
+#              env:
+#                - name: MONGO_SIDECAR_POD_LABELS
+#                  value: "app=mongo,app.kubernetes.io/managed-by=spaship"
       volumeClaimTemplates:
         - metadata:
             name: mongo-volume
@@ -114,7 +114,7 @@ objects:
             storageClassName: "${STORAGE_CLASS}"
             resources:
               requests:
-                storage: 1Gi
+                storage: 2Gi
   - kind: ConfigMap
     apiVersion: v1
     metadata:

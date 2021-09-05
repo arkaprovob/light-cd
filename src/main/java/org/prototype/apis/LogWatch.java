@@ -23,7 +23,7 @@ public class LogWatch {
     @Path("/watch/{name}")
     @Produces(MediaType.TEXT_PLAIN)
     public Uni<String> cleanupK8SNameSpace(@PathParam("name") String podName, @QueryParam("line") String line) {
-        return logWatcher.watch(nameSpace,podName,Integer.parseInt(line));
+        return logWatcher.watch(nameSpace, podName, Integer.parseInt(line));
     }
 
     @GET

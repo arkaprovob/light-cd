@@ -54,8 +54,8 @@ public class K8sOps {
         LOG.info("received payload {}", payload);
         Map<String, String> templateParameters = Map.of("TAG", payload.getUpdatedTags().get(0),
                 "STORAGE_CLASS", ConfigProvider.getConfig().getValue("template.storage.param.value", String.class),
-                "API_URL",ConfigProvider.getConfig().getValue("template.api.url.param.value", String.class),
-                "UI_MEMORY_LIMIT",ConfigProvider.getConfig().getValue("template.ui.memory.limit", String.class));
+                "API_URL", ConfigProvider.getConfig().getValue("template.api.url.param.value", String.class),
+                "UI_MEMORY_LIMIT", ConfigProvider.getConfig().getValue("template.ui.memory.limit", String.class));
 
         LOG.debug("templateParameters are as follows {}", templateParameters);
 
@@ -79,7 +79,7 @@ public class K8sOps {
             if (resource instanceof Deployment)
                 handleDeployment(payload, namespace, (Deployment) resource, resourceName);
             if (resource instanceof ConfigMap)
-                handleConfigMap(payload,namespace, (ConfigMap) resource, resourceName);
+                handleConfigMap(payload, namespace, (ConfigMap) resource, resourceName);
             if (resource instanceof Service)
                 handleService(namespace, (Service) resource, resourceName);
             if (resource instanceof HorizontalPodAutoscaler)
@@ -96,7 +96,7 @@ public class K8sOps {
     void cleanupResources(String nameSpace) {
 
         LOG.info("cleaning all resources from  {}", nameSpace);
-        var labelFilter = Map.of("app.kubernetes.io/managed-by","spaship");
+        var labelFilter = Map.of("app.kubernetes.io/managed-by", "spaship");
 
         Uni.createFrom()
                 .item(() -> {
@@ -124,9 +124,6 @@ public class K8sOps {
                             openShiftClient.configMaps().inNamespace(nameSpace).withLabels(labelFilter))
                             .map(Deletable::delete)
                             .orElse(false);
-
-
-
 
 
                     return (dDStatus && ssDStatus && hpaDStatus && svcDStatus && cmDStatus);
@@ -157,14 +154,14 @@ public class K8sOps {
         }
     }
 
-    private void handleConfigMap(Payload payload,String namespace, ConfigMap resource, String resourceName) {
+    private void handleConfigMap(Payload payload, String namespace, ConfigMap resource, String resourceName) {
         LOG.debug("dealing with the ConfigMap");
         var configMapInK8s = openShiftClient.configMaps().inNamespace(namespace).withName(resourceName).get();
         if (Objects.isNull(configMapInK8s)) {
             LOG.debug("ConfigMap {} doesn't exist creating new ", resourceName);
             openShiftClient.configMaps().inNamespace(namespace).createOrReplace(resource);
             LOG.info("ConfigMap {} created successfully ", resourceName);
-        }else if( resourceName.contains(payload.getName())){
+        } else if (resourceName.contains(payload.getName())) {
             LOG.debug("Config Map {} exists and need to update", resourceName);
             openShiftClient.configMaps().inNamespace(namespace).withName(resourceName).delete();
             LOG.debug("deleted Config Map {}", resourceName);
@@ -197,8 +194,8 @@ public class K8sOps {
             LOG.debug("StatefulSet {} doesn't exist creating new ", resourceName);
             var statefulSet = openShiftClient.apps().statefulSets().inNamespace(namespace).createOrReplace(resource);
             LOG.info("StatefulSet {} created successfully ", resourceName);
-            String noOfReplica = Integer.toString(statefulSet.getSpec().getReplicas()-1);
-            managedResourceWatcher.initiatePodWatcher(namespace,Map.of("app","mongo"),noOfReplica);
+            String noOfReplica = Integer.toString(statefulSet.getSpec().getReplicas() - 1);
+            managedResourceWatcher.initiatePodWatcher(namespace, Map.of("app", "mongo"), noOfReplica);
         }
     }
 }
