@@ -380,8 +380,13 @@ objects:
             app.kubernetes.io/name: operator
             app.kubernetes.io/instance: operator
         spec:
+          serviceAccountName: light-cd
+          securityContext:
+            {}
           containers:
             - name: operator
+              securityContext:
+                {}
               image: "${OPERATOR_REPOSITORY}:${TAG}"
               envFrom:
                 - configMapRef:
