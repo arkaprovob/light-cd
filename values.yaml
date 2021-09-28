@@ -87,3 +87,4 @@ app:
   storageclass: gp2
   apiurl: http://spaship-manager-arbhatta-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com/api/v1
   uimemory: 512Mi
+  domain: na

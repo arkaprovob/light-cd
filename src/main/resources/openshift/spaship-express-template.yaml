@@ -36,6 +36,8 @@ parameters:
     description: "memory limit for spaship ui"
     value: "512Mi"
     required: true
+  - name: "DOMAIN"
+    required: true
 objects:
   - kind: Service
     apiVersion: v1
@@ -360,6 +362,7 @@ objects:
         app.kubernetes.io/managed-by: spaship
     data:
       OPERATOR_EVENT_BUS_ADDRESS: spa-ops-event-channel
+      OPERATOR_DOMAIN_NAME: ${DOMAIN}
   - kind: Deployment
     apiVersion: apps/v1
     metadata:

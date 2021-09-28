@@ -55,7 +55,9 @@ public class K8sOps {
         Map<String, String> templateParameters = Map.of("TAG", payload.getUpdatedTags().get(0),
                 "STORAGE_CLASS", ConfigProvider.getConfig().getValue("template.storage.param.value", String.class),
                 "API_URL", ConfigProvider.getConfig().getValue("template.api.url.param.value", String.class),
-                "UI_MEMORY_LIMIT", ConfigProvider.getConfig().getValue("template.ui.memory.limit", String.class));
+                "UI_MEMORY_LIMIT", ConfigProvider.getConfig().getValue("template.ui.memory.limit", String.class),
+                "DOMAIN", ConfigProvider.getConfig().getValue("template.domain", String.class)
+        );
 
         LOG.debug("templateParameters are as follows {}", templateParameters);
 
