@@ -28,7 +28,7 @@ public class Deployment {
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
     public String deploy(Payload payload) {
-        if (!payload.tagExists(tag)) {
+        if (!tag.equals("*") || !payload.tagExists(tag)) {
             LOG.info("incoming event is not a part of this instance");
             return "skipped";
         }
