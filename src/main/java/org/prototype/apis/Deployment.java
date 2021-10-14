@@ -2,6 +2,7 @@ package org.prototype.apis;
 
 import io.vertx.mutiny.core.eventbus.EventBus;
 import org.eclipse.microprofile.config.ConfigProvider;
+import org.prototype.exception.CheckedException;
 import org.prototype.type.Payload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +29,7 @@ public class Deployment {
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
     public String deploy(Payload payload) {
-        if (!tag.equals("*") && !payload.tagExists(tag)) {
-            LOG.info("incoming event is not a part of this instance");
-            return "skipped";
-        }
+        validateIncomingEvent(payload);
         payload.setK8sNameSpace(nameSpace);
         bus.send("process.deployment", payload);
         return "accepted";
@@ -42,6 +40,13 @@ public class Deployment {
     public String cleanupK8SNameSpace() {
         bus.send("process.cleanup", nameSpace);
         return "accepted";
+    }
+
+    void validateIncomingEvent(Payload payload){
+        if (!tag.equals("*") && !payload.tagExists(tag)) {
+            LOG.info("validation trigger condition not met");
+            throw new CheckedException("incoming event is not a part of this instance");
+        }
     }
 
 
