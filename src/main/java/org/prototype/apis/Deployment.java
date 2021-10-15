@@ -29,6 +29,7 @@ public class Deployment {
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
     public String deploy(Payload payload) {
+        LOG.debug("incoming payload is {}",payload);
         validateIncomingEvent(payload);
         payload.setK8sNameSpace(nameSpace);
         bus.send("process.deployment", payload);
