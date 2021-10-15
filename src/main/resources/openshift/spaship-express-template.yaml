@@ -5,9 +5,30 @@ metadata:
 labels:
   template: "deployment-template"
 parameters:
-  - name: "TAG"
-    description: "tag of the deployment"
-    value: develop
+
+  - name: "API_REPOSITORY"
+    description: "SPAship orchestrator repository"
+    value: "quay.io/spaship/api"
+    required: true
+  - name: "TAG_API"
+    description: "tag of the api"
+    value: master
+    required: true
+  - name: "TAG_OPERATOR"
+    description: "tag of the orchestrator"
+    value: master
+    required: true
+  - name: "OPERATOR_REPOSITORY"
+    description: "SPAship operator repository"
+    value: "quay.io/spaship/operator"
+    required: true
+  - name: "TAG_SPASHIP-UI"
+    description: "tag of the api"
+    value: master
+    required: true
+  - name: "UI_REPOSITORY"
+    description: "SPAship UI repository"
+    value: "quay.io/spaship/spaship-ui"
     required: true
   - name: "STORAGE_CLASS"
     description: "volume of the deployment"
@@ -16,17 +37,6 @@ parameters:
   - name: "MONGO_REPOSITORY"
     description: "mongodb container repository"
     value: "quay.io/arbhatta/mongo:4.2.8"
-    required: false
-  - name: "MANAGER_REPOSITORY"
-    description: "SPAship manager repository"
-    value: "quay.io/spaship/spaship-manager"
-  - name: "OPERATOR_REPOSITORY"
-    description: "SPAship operator repository"
-    value: "quay.io/arbhatta/operator"
-    required: false
-  - name: "UI_REPOSITORY"
-    description: "SPAship UI repository"
-    value: "quay.io/spaship/spaship-ui"
     required: false
   - name: "API_URL"
     description: "api url for spaship orchestrator"
@@ -123,10 +133,10 @@ objects:
   - kind: ConfigMap
     apiVersion: v1
     metadata:
-      name: spaship-manager-config
+      name: api-config
       labels:
-        app.kubernetes.io/name: spaship-manager
-        app.kubernetes.io/instance: spaship-manager
+        app.kubernetes.io/name: api
+        app.kubernetes.io/instance: api
         app.kubernetes.io/version: 1.0.0
         app.kubernetes.io/managed-by: spaship
     data:
@@ -145,10 +155,10 @@ objects:
   - kind: Service
     apiVersion: v1
     metadata:
-      name: spaship-manager-service
+      name: api-service
       labels:
-        app.kubernetes.io/name: spaship-manager
-        app.kubernetes.io/instance: spaship-manager
+        app.kubernetes.io/name: api
+        app.kubernetes.io/instance: api
         app.kubernetes.io/version: 1.0.0
         app.kubernetes.io/managed-by: spaship
     spec:
@@ -160,8 +170,8 @@ objects:
           protocol: TCP
           name: http
       selector:
-        app.kubernetes.io/name: spaship-manager
-        app.kubernetes.io/instance: spaship-manager
+        app.kubernetes.io/name: api
+        app.kubernetes.io/instance: api
   - kind: Service
     apiVersion: v1
     metadata:
@@ -185,29 +195,29 @@ objects:
   - kind: Deployment
     apiVersion: apps/v1
     metadata:
-      name: spaship-manager
+      name: api
       labels:
-        app.kubernetes.io/name: spaship-manager
-        app.kubernetes.io/instance: spaship-manager
+        app.kubernetes.io/name: api
+        app.kubernetes.io/instance: api
         app.kubernetes.io/version: 1.0.0
         app.kubernetes.io/managed-by: spaship
     spec:
       selector:
         matchLabels:
-          app.kubernetes.io/name: spaship-manager
-          app.kubernetes.io/instance: spaship-manager
+          app.kubernetes.io/name: api
+          app.kubernetes.io/instance: api
       template:
         metadata:
           labels:
-            app.kubernetes.io/name: spaship-manager
-            app.kubernetes.io/instance: spaship-manager
+            app.kubernetes.io/name: api
+            app.kubernetes.io/instance: api
         spec:
           containers:
-            - name: spaship-manager
-              image: "${MANAGER_REPOSITORY}:${TAG}"
+            - name: api
+              image: "${API_REPOSITORY}:${TAG_API}"
               envFrom:
                 - configMapRef:
-                    name: spaship-manager-config
+                    name: api-config
               imagePullPolicy: Always
               ports:
                 - name: http
@@ -277,7 +287,7 @@ objects:
         spec:
           containers:
             - name: spaship-ui
-              image: "${UI_REPOSITORY}:${TAG}"
+              image: "${UI_REPOSITORY}:${TAG_SPASHIP-UI}"
               env:
               - name: REACT_APP_API_URL
                 value: ${API_URL}
@@ -390,7 +400,7 @@ objects:
             - name: operator
               securityContext:
                 {}
-              image: "${OPERATOR_REPOSITORY}:${TAG}"
+              image: "${OPERATOR_REPOSITORY}:${TAG_OPERATOR}"
               envFrom:
                 - configMapRef:
                     name: operator-config
