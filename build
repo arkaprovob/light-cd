@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# build distribution
+mvn -B package --file pom.xml
+
+# create docker image, tag the image and push it into dev repo
+docker build -t light-cd -f src/main/docker/Dockerfile.jvm .
+docker tag operator quay.io/arbhatta/light-cd:master
+echo $quay_password | docker login quay.io --username $quay_user --password-stdin
+docker push quay.io/arbhatta/light-cd:master
+
+# get the user input of application domain for supporting ingress controller
+read -p "Enter app domain: " domain
+
+# based on provided domain either end the flow or deploy the existing helm chart
+if [ -z "$domain" ]; then
+   printf '%s\n' "No domain entered"
+   exit 1
+else
+   printf "app domain is set to %s \n" "$domain"
+   prefixUrl="http://spaship-manager-arbhatta-dev."
+   apiContextPath="/api/v1"
+   fullPath="${prefixUrl}${domain}${apiContextPath}"
+   echo "helm install --set image.repository=quay.io/arbhatta/light-cd --set image.tag=master --set app.namespace=light-cd --set app.environment=* --set app.storageclass=gp2 --set app.apiurl=$fullPath --set app.uimemory=1024Mi --set app.domain=$domain light-cd ."
+   helm install --set image.repository=quay.io/arbhatta/light-cd --set image.tag=master --set app.namespace=light-cd --set app.environment=* --set app.storageclass=gp2 --set app.apiurl=$fullPath --set app.uimemory=1024Mi --set app.domain=$domain light-cd .
+fi
