@@ -14,7 +14,7 @@ read -p "Enter app domain: " domain
 
 # based on provided domain either end the flow or deploy the existing helm chart
 if [ -z "$domain" ]; then
-   printf '%s\n' "No domain entered"
+   printf '%s\n' "No domain value found in this session"
    exit 1
 else
    printf "app domain is set to %s \n" "$domain"
