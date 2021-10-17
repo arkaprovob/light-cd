@@ -5,7 +5,7 @@ mvn -B package --file pom.xml
 
 # create docker image, tag the image and push it into dev repo
 docker build -t light-cd -f src/main/docker/Dockerfile.jvm .
-docker tag operator quay.io/arbhatta/light-cd:master
+docker tag light-cd quay.io/arbhatta/light-cd:master
 echo $quay_password | docker login quay.io --username $quay_user --password-stdin
 docker push quay.io/arbhatta/light-cd:master
 
@@ -17,10 +17,11 @@ if [ -z "$domain" ]; then
    printf '%s\n' "No domain value found in this session"
    exit 1
 else
+   helm delete light-cd
    printf "app domain is set to %s \n" "$domain"
    prefixUrl="http://spaship-manager-arbhatta-dev."
    apiContextPath="/api/v1"
    fullPath="${prefixUrl}${domain}${apiContextPath}"
-   echo "helm install --set image.repository=quay.io/arbhatta/light-cd --set image.tag=master --set app.namespace=light-cd --set app.environment=* --set app.storageclass=gp2 --set app.apiurl=$fullPath --set app.uimemory=1024Mi --set app.domain=$domain light-cd ."
-   helm install --set image.repository=quay.io/arbhatta/light-cd --set image.tag=master --set app.namespace=light-cd --set app.environment=* --set app.storageclass=gp2 --set app.apiurl=$fullPath --set app.uimemory=1024Mi --set app.domain=$domain light-cd .
+   echo "helm install --set image.repository=quay.io/arbhatta/light-cd --set image.tag=master --set app.namespace=light-cd --set app.environment=* --set app.storageclass=local-path --set app.apiurl=$fullPath --set app.uimemory=1024Mi --set app.domain=$domain light-cd ."
+   helm install --set image.repository=quay.io/arbhatta/light-cd --set image.tag=master --set app.namespace=light-cd --set app.environment=* --set app.storageclass=local-path --set app.apiurl=$fullPath --set app.uimemory=1024Mi --set app.domain=$domain light-cd .
 fi
