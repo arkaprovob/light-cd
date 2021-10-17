@@ -22,13 +22,13 @@ parameters:
     description: "SPAship operator repository"
     value: "quay.io/spaship/operator"
     required: true
-  - name: "TAG_SPASHIP-UI"
-    description: "tag of the api"
+  - name: "TAG_MANAGER"
+    description: "tag of the manager ui"
     value: master
     required: true
-  - name: "UI_REPOSITORY"
+  - name: "MANAGER_REPOSITORY"
     description: "SPAship UI repository"
-    value: "quay.io/spaship/spaship-ui"
+    value: "quay.io/spaship/manager"
     required: true
   - name: "STORAGE_CLASS"
     description: "volume of the deployment"
@@ -240,6 +240,12 @@ objects:
                 requests:
                   cpu: 300m
                   memory: 256Mi
+          initContainers:
+            - name: ini-mongodb
+              image: busybox
+              imagePullPolicy: IfNotPresent
+              command: [ 'sh','-c','until nslookup mongo; do echo waiting for keycloak; sleep 2; done;' ]
+
   - kind: HorizontalPodAutoscaler
     apiVersion: autoscaling/v2beta1
     metadata:
@@ -287,7 +293,7 @@ objects:
         spec:
           containers:
             - name: spaship-ui
-              image: "${UI_REPOSITORY}:${TAG_SPASHIP-UI}"
+              image: "${MANAGER_REPOSITORY}:${TAG_MANAGER}"
               env:
               - name: REACT_APP_API_URL
                 value: ${API_URL}
