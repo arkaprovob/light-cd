@@ -1,0 +1,18 @@
+{{- if .Values.ingress.enabled -}}
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: ingress-{{ include "light-cd.fullname" . }}
+spec:
+  rules:
+    - host: {{ .Values.nameOverride }}.{{ .Values.app.domain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-{{ include "light-cd.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+  {{- end }}
