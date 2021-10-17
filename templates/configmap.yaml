@@ -4,7 +4,7 @@ metadata:
   name: light-cd-config
 data:
   APPLICATION_K8S_NAMESPACE: {{ .Values.app.namespace }}
-  VALIDATION_TRIGGER_TAG: {{ .Values.app.environment }}
+  VALIDATION_TRIGGER_TAG: {{ .Values.app.environment | squote  }}
   TEMPLATE_STORAGE_PARAM_VALUE: {{ .Values.app.storageclass }}
   TEMPLATE_API_URL_PARAM_VALUE: {{ .Values.app.apiurl }}
   TEMPLATE_UI_MEMORY_LIMIT: {{ .Values.app.uimemory }}
