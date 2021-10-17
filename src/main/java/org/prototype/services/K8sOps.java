@@ -10,7 +10,6 @@ import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
-import io.vertx.mutiny.core.eventbus.Message;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.prototype.type.Payload;
 import org.slf4j.Logger;
@@ -34,32 +33,15 @@ public class K8sOps {
         this.managedResourceWatcher = managedResourceWatcher;
     }
 
-    @ConsumeEvent("process.deployment")
-    public void processDeploymentEvent(Message<Payload> event) {
 
-        Payload payload = event.body();
-        String namespace = payload.getK8sNameSpace();
 
-        Uni.createFrom().item(payload)
-                .emitOn(Infrastructure.getDefaultExecutor())
-                .map(item -> businessLogic(item, namespace))
-                .subscribe()
-                .with(consumer -> LOG.info("deployment success status {}", consumer));
-    }
 
-    private boolean businessLogic(Payload payload, String namespace) {
+    public boolean businessLogic(Map<String, String> templateParameters,String selectedResourceName,String namespace) {
 
         var success = false;
 
-        LOG.info("received payload {}", payload);
-        Map<String, String> templateParameters = Map.of("TAG", payload.getUpdatedTags().get(0),
-                "STORAGE_CLASS", ConfigProvider.getConfig().getValue("template.storage.param.value", String.class),
-                "API_URL", ConfigProvider.getConfig().getValue("template.api.url.param.value", String.class),
-                "UI_MEMORY_LIMIT", ConfigProvider.getConfig().getValue("template.ui.memory.limit", String.class),
-                "DOMAIN", ConfigProvider.getConfig().getValue("template.domain", String.class)
-        );
-
-        LOG.debug("templateParameters are as follows {}", templateParameters);
+        LOG.info("templateParameters are as follows {} and selectedResourceName is {}",
+                templateParameters,selectedResourceName);
 
         var k8sResourceList
                 = openShiftClient
@@ -74,14 +56,14 @@ public class K8sOps {
 
             var resourceName = resource.getMetadata().getName();
 
-            //Class.forName(resource.getKind());
+            LOG.info("resource type is {}",resource.getKind());
 
             if (resource instanceof StatefulSet)
                 handleStatefulSet(namespace, (StatefulSet) resource, resourceName);
             if (resource instanceof Deployment)
-                handleDeployment(payload, namespace, (Deployment) resource, resourceName);
+                handleDeployment(selectedResourceName, namespace, (Deployment) resource, resourceName);
             if (resource instanceof ConfigMap)
-                handleConfigMap(payload, namespace, (ConfigMap) resource, resourceName);
+                handleConfigMap(selectedResourceName, namespace, (ConfigMap) resource, resourceName);
             if (resource instanceof Service)
                 handleService(namespace, (Service) resource, resourceName);
             if (resource instanceof HorizontalPodAutoscaler)
@@ -156,14 +138,14 @@ public class K8sOps {
         }
     }
 
-    private void handleConfigMap(Payload payload, String namespace, ConfigMap resource, String resourceName) {
+    private void handleConfigMap(String selectedResourceName, String namespace, ConfigMap resource, String resourceName) {
         LOG.debug("dealing with the ConfigMap");
         var configMapInK8s = openShiftClient.configMaps().inNamespace(namespace).withName(resourceName).get();
         if (Objects.isNull(configMapInK8s)) {
             LOG.debug("ConfigMap {} doesn't exist creating new ", resourceName);
             openShiftClient.configMaps().inNamespace(namespace).createOrReplace(resource);
             LOG.info("ConfigMap {} created successfully ", resourceName);
-        } else if (resourceName.contains(payload.getName())) {
+        } else if (resourceName.contains(selectedResourceName)) {
             LOG.debug("Config Map {} exists and need to update", resourceName);
             openShiftClient.configMaps().inNamespace(namespace).withName(resourceName).delete();
             LOG.debug("deleted Config Map {}", resourceName);
@@ -172,14 +154,14 @@ public class K8sOps {
         }
     }
 
-    private void handleDeployment(Payload payload, String namespace, Deployment resource, String resourceName) {
-        LOG.debug("dealing with the Deployment, payload name attribute {}, resource {}", payload.getName(), resourceName);
+    private void handleDeployment(String selectedResourceName, String namespace, Deployment resource, String resourceName) {
+        LOG.debug("dealing with the Deployment, payload name attribute {}, resource {}", selectedResourceName, resourceName);
         var deploymentInK8s = openShiftClient.apps().deployments().inNamespace(namespace).withName(resourceName).get();
         if (Objects.isNull(deploymentInK8s)) {
             LOG.debug("Deployment {} doesn't exist creating new ", resourceName);
             openShiftClient.apps().deployments().inNamespace(namespace).createOrReplace(resource);
             LOG.info("Deployment {} created successfully ", resourceName);
-        } else if (payload.getName().equalsIgnoreCase(resourceName)) {
+        } else if (selectedResourceName.equalsIgnoreCase(resourceName)) {
             LOG.debug("Deployment {} exists and need to update", resourceName);
             openShiftClient.apps().deployments().inNamespace(namespace).withName(resourceName).delete();
             LOG.debug("deleted deployment {}", resourceName);
