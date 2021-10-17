@@ -7,11 +7,13 @@ import org.prototype.type.Payload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 @Path("/deploy")
+@ApplicationScoped
 public class Deployment {
     private static final Logger LOG = LoggerFactory.getLogger(Deployment.class);
 
