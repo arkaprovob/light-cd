@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.StatefulSet;
 import io.fabric8.kubernetes.api.model.autoscaling.v2beta1.HorizontalPodAutoscaler;
+import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
 import io.fabric8.kubernetes.client.dsl.Deletable;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.vertx.ConsumeEvent;
@@ -68,6 +69,8 @@ public class K8sOps {
                 handleService(namespace, (Service) resource, resourceName);
             if (resource instanceof HorizontalPodAutoscaler)
                 handleHPA(namespace, (HorizontalPodAutoscaler) resource, resourceName);
+            if (resource instanceof Ingress)
+                handleIngress(namespace, (Ingress) resource, resourceName);
 
 
         });
@@ -182,4 +185,16 @@ public class K8sOps {
             managedResourceWatcher.initiatePodWatcher(namespace, Map.of("app", "mongo"), noOfReplica);
         }
     }
+
+    private void handleIngress(String namespace, Ingress resource, String resourceName) {
+        LOG.debug("dealing with the ingress in namespace {}", namespace);
+        var ingressInK8s = openShiftClient.network().v1().ingresses().inNamespace(namespace).withName(resourceName).get();
+        if (Objects.isNull(ingressInK8s)) {
+            LOG.debug("Ingress {} doesn't exist creating new ", resourceName);
+            openShiftClient.network().v1().ingresses().inNamespace(namespace).createOrReplace(resource);
+            LOG.info("Ingress {} created successfully ", resourceName);
+        }
+    }
+
+
 }

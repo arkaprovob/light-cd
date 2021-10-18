@@ -439,6 +439,8 @@ objects:
     apiVersion: networking.k8s.io/v1
     metadata:
       name: ing-{{ .Values.app.instance }}-operator
+      labels:
+        app.kubernetes.io/managed-by: spaship
     spec:
       rules:
         - host: ${APP_INSTANCE}.operator.${DOMAIN}
@@ -455,6 +457,8 @@ objects:
     apiVersion: networking.k8s.io/v1
     metadata:
       name: ing-{{ .Values.app.instance }}-api
+      labels:
+        app.kubernetes.io/managed-by: spaship
     spec:
       rules:
         - host: ${APP_INSTANCE}.api.${DOMAIN}
@@ -471,6 +475,8 @@ objects:
     apiVersion: networking.k8s.io/v1
     metadata:
       name: ing-{{ .Values.app.instance }}-manager
+      labels:
+        app.kubernetes.io/managed-by: spaship
     spec:
       rules:
         - host: ${APP_INSTANCE}.manager.${DOMAIN}
