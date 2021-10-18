@@ -5,7 +5,7 @@ metadata:
   name: ingress-{{ include "light-cd.fullname" . }}
 spec:
   rules:
-    - host: {{ .Values.nameOverride }}.{{ .Values.app.domain }}
+    - host: {{ .Values.app.instance }}.{{ .Values.nameOverride }}.{{ .Values.app.domain }}
       http:
         paths:
           - path: /
