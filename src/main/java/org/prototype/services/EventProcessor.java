@@ -55,7 +55,9 @@ public class EventProcessor {
                         .getValue("template.ui.memory.limit", String.class),
                 "DOMAIN", ConfigProvider.getConfig().getValue("template.domain", String.class),
                 tagNameAttribute,payload.getUpdatedTags().get(0),
-                repoAttribute,payload.getDockerUrl()
+                repoAttribute,payload.getDockerUrl(),
+                "APP_INSTANCE",ConfigProvider.getConfig()
+                        .getValue("app.instance", String.class)
         );
     }
 

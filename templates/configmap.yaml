@@ -9,3 +9,4 @@ data:
   TEMPLATE_API_URL_PARAM_VALUE: {{ .Values.app.apiurl }}
   TEMPLATE_UI_MEMORY_LIMIT: {{ .Values.app.uimemory }}
   TEMPLATE_DOMAIN: {{ .Values.app.domain }}
+  APP_INSTANCE: {{ .Values.app.instance }}
