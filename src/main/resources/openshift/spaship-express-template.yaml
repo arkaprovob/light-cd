@@ -242,7 +242,7 @@ objects:
                   memory: 256Mi
           initContainers:
             - name: ini-mongodb
-              image: busybox
+              image: quay.io/arbhatta/busybox
               imagePullPolicy: IfNotPresent
               command: [ 'sh','-c','until nslookup mongo; do echo waiting for keycloak; sleep 2; done;' ]
 
