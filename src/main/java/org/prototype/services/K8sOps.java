@@ -112,8 +112,11 @@ public class K8sOps {
                             .map(Deletable::delete)
                             .orElse(false);
 
-
-                    return (dDStatus && ssDStatus && hpaDStatus && svcDStatus && cmDStatus);
+                    boolean icDStatus = Optional.ofNullable(
+                            openShiftClient.network().v1().ingresses().inNamespace(nameSpace).withLabels(labelFilter))
+                            .map(Deletable::delete)
+                            .orElse(false);
+                    return (dDStatus && ssDStatus && hpaDStatus && svcDStatus && cmDStatus && icDStatus);
                 })
                 .runSubscriptionOn(Infrastructure.getDefaultExecutor())
                 .subscribe()

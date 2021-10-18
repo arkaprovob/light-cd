@@ -104,6 +104,7 @@
         .provided-code h3 {
             font-weight: 200;
         }
+
     </style>
 </head>
 <body>
@@ -114,7 +115,10 @@
 
 <div class="container">
     <div class="left-column">
-        <p class="lead"> Deploy a new release or watch Logs using the available rest apis, listed below</p>
+        <p class="lead" id="href"> </p>
+        <script>
+            document.getElementById("href").innerHTML = 'Deploy a new release or watch Logs using the available rest apis, listed below and, base url of this instance is <a href="#">'+window.location.href+'</a>';
+        </script>
 
         <div class="provided-code">
             <h3></h3>
@@ -139,29 +143,29 @@
             <p>Update an existing deployment(will also create related resources if not exists)</p>
             <p><code>@Post: <a class="path-link" href="/deploy" target="_blank">deploy</a></code></p>
             <div class="provided-code">
-                <p><b>Body to deploy/update <code>spaship-ui</code> in a specific environment</b>
+                <p><b>Body to deploy/update <code>manager(FKA spaship-ui)</code> in a specific environment</b>
             <p><code style="font-size:.7em;">
                 {
-                "name":"spaship-ui",
-                "repository":"spaship/spaship-ui",
+                "name":"manager",
+                "repository":"spaship/manager",
                 "namespace":"spaship",
-                "docker_url":"quay.io/spaship/spaship-ui",
-                "homepage":"https://quay.io/repository/spaship/spaship-ui",
+                "docker_url":"quay.io/spaship/manager",
+                "homepage":"https://quay.io/repository/spaship/manager",
                 "updated_tags":[
-                "develop"
+                "master"
                 ]
                 }
             </code></p>
             <p>the <code>updated_tags</code> specifies in which environment the resource is going to be deployed</p>
                 <p>CURL:
-                <code style="font-size:.7em;">curl --location --request POST 'http://light-cd-arbhatta-stage.apps.sandbox-m2.ll9k.p1.openshiftapps.com/deploy' \
+                <code style="font-size:.7em;">curl --location --request POST '<a class="path-link" href="/deploy" target="_blank">/deploy</a>' \
                     --header 'Content-Type: application/json' \
                     --data-raw '{
-                    "name": "spaship-ui",
-                    "repository": "spaship/spaship-ui",
+                    "name": "manager",
+                    "repository": "spaship/manager",
                     "namespace": "spaship",
-                    "docker_url": "quay.io/spaship/spaship-ui",
-                    "homepage": "https://quay.io/repository/spaship/spaship-ui",
+                    "docker_url": "quay.io/spaship/manager",
+                    "homepage": "https://quay.io/repository/spaship/manager",
                     "updated_tags": [
                     "develop"
                     ]
@@ -169,20 +173,39 @@
                 </p>
             </div>
             <div class="provided-code">
-                <p><b>Body to deploy/update <code>spaship-manager</code> in a specific environment</b>
-                <p><code style="font-size:.7em;"> {  "name": "spaship-manager",  "repository": "spaship/spaship-manager",  "namespace": "spaship",  "docker_url": "quay.io/spaship/spaship-manager",  "homepage": "https://quay.io/repository/spaship/spaship-manager",  "updated_tags": [    "develop"  ]}</code></p>
+                <p><b>Body to deploy/update <code>api(FKA spaship-manager)</code> in a specific environment</b>
+                <p><code style="font-size:.7em;"> {  "name": "api",  "repository": "spaship/api",  "namespace": "spaship",  "docker_url": "quay.io/spaship/api",  "homepage": "https://quay.io/repository/spaship/api",  "updated_tags": [    "master"  ]}</code></p>
                 <p>the <code>updated_tags</code> specifies in which environment the resource is going to be deployed</p>
                 <p>CURL:
-                    <code style="font-size:.7em;">curl --location --request POST 'http://light-cd-arbhatta-stage.apps.sandbox-m2.ll9k.p1.openshiftapps.com/deploy' \
+                    <code style="font-size:.7em;">curl --location --request POST '<a class="path-link" href="/deploy" target="_blank">/deploy</a>' \
                         --header 'Content-Type: application/json' \
                         --data-raw '{
-                        "name": "spaship-manager",
-                        "repository": "spaship/spaship-manager",
+                        "name": "api",
+                        "repository": "spaship/api",
                         "namespace": "spaship",
-                        "docker_url": "quay.io/spaship/spaship-manager",
-                        "homepage": "https://quay.io/repository/spaship/spaship-manager",
+                        "docker_url": "quay.io/spaship/api",
+                        "homepage": "https://quay.io/repository/spaship/api",
                         "updated_tags": [
-                        "develop"
+                        "master"
+                        ]
+                        }'</code>
+                </p>
+            </div>
+            <div class="provided-code">
+                <p><b>Body to deploy/update <code>operator(FKA deployment-engine)</code> in a specific environment</b>
+                <p><code style="font-size:.7em;"> {  "name": "operator",  "repository": "spaship/operator",  "namespace": "spaship",  "docker_url": "quay.io/spaship/operator",  "homepage": "https://quay.io/repository/spaship/operator",  "updated_tags": [    "master"  ]}</code></p>
+                <p>the <code>updated_tags</code> specifies in which environment the resource is going to be deployed</p>
+                <p>CURL:
+                    <code style="font-size:.7em;">curl --location --request POST '<a class="path-link" href="/deploy" target="_blank">/deploy</a>' \
+                        --header 'Content-Type: application/json' \
+                        --data-raw '{
+                        "name": "operator",
+                        "repository": "spaship/operator",
+                        "namespace": "spaship",
+                        "docker_url": "quay.io/spaship/operator",
+                        "homepage": "https://quay.io/repository/spaship/operator",
+                        "updated_tags": [
+                        "master"
                         ]
                         }'</code>
                 </p>
