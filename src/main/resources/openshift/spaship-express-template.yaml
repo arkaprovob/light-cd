@@ -438,7 +438,7 @@ objects:
   - kind: Ingress
     apiVersion: networking.k8s.io/v1
     metadata:
-      name: ing-{{ .Values.app.instance }}-operator
+      name: ing-${APP_INSTANCE}-operator
       labels:
         app.kubernetes.io/managed-by: spaship
     spec:
@@ -456,7 +456,7 @@ objects:
   - kind: Ingress
     apiVersion: networking.k8s.io/v1
     metadata:
-      name: ing-{{ .Values.app.instance }}-api
+      name: ing-${APP_INSTANCE}-api
       labels:
         app.kubernetes.io/managed-by: spaship
     spec:
@@ -474,7 +474,7 @@ objects:
   - kind: Ingress
     apiVersion: networking.k8s.io/v1
     metadata:
-      name: ing-{{ .Values.app.instance }}-manager
+      name: ing-${APP_INSTANCE}-manager
       labels:
         app.kubernetes.io/managed-by: spaship
     spec:
