@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,6 +45,11 @@ public class K8sOps {
         LOG.info("templateParameters are as follows {} and selectedResourceName is {}",
                 templateParameters,selectedResourceName);
 
+        Map<String, String> envConfig = getEnvironmentConfigData(ConfigProvider.getConfig()
+                .getValue("ops.environment.configmap.name", String.class),namespace);
+        LOG.info("env parameters are as follows {}",envConfig);
+        templateParameters.putAll(envConfig);
+        LOG.info("final list of params are as follows {}",templateParameters);
         var k8sResourceList
                 = openShiftClient
                 .templates()
@@ -76,6 +82,16 @@ public class K8sOps {
         });
         success = true;
         return success;
+    }
+
+    private Map<String, String> getEnvironmentConfigData(String configMapName,String nameSpace) {
+
+        LOG.info("Looking for configmap {} in namespace {}",configMapName,configMapName);
+
+        return Optional.ofNullable(openShiftClient.configMaps().inNamespace(nameSpace).withName(configMapName))
+                .map(configMap->configMap.get().getData())
+                .orElse(Collections.emptyMap());
+
     }
 
 
@@ -198,6 +214,7 @@ public class K8sOps {
             LOG.info("Ingress {} created successfully ", resourceName);
         }
     }
+
 
 
 }

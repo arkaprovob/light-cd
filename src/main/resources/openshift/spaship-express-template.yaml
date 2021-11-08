@@ -51,6 +51,28 @@ parameters:
   - name: "APP_INSTANCE"
     description: "application instance"
     required: true
+  - name: "KEYCLOAK_CLIENTID"
+    description: "identity provider's client id"
+    required: true
+  - name: "KEYCLOAK_ID_PROP"
+    description: "identity provider's id"
+    required: true
+  - name: "KEYCLOAK_PUBKEY"
+    description: "identity provider's access public key"
+    required: true
+  - name: "KEYCLOAK_REALM"
+    description: "realm of authentication and authorization"
+    required: true
+  - name: "KEYCLOAK_URL"
+    description: "identity provider's url"
+    required: true
+  - name: "API_AUTH_ADMIN_GROUP"
+    description: "api auth ldap admin group"
+    required: true
+  - name: "API_AUTH_USER_GROUP"
+    description: "api auth ldap user group"
+    required: true
+
 objects:
   - kind: Service
     apiVersion: v1
@@ -143,7 +165,16 @@ objects:
         app.kubernetes.io/version: 1.0.0
         app.kubernetes.io/managed-by: spaship
     data:
-      DB_CON: mongo-0.mongo:27017
+      SPASHIP_DB__MONGO__URL: mongo-0.mongo:27017
+      SPASHIP_AUTH__KEYCLOAK__CLIENTID: ${KEYCLOAK_CLIENTID}
+      SPASHIP_AUTH__KEYCLOAK__ID_PROP: ${KEYCLOAK_ID_PROP}
+      SPASHIP_AUTH__KEYCLOAK__PUBKEY: ${KEYCLOAK_PUBKEY}
+      SPASHIP_AUTH__KEYCLOAK__REALM: ${KEYCLOAK_REALM}
+      SPASHIP_AUTH__KEYCLOAK__URL: ${KEYCLOAK_URL}
+      SPASHIP_AUTH__LDAP__ADMIN_GROUP: ${API_AUTH_ADMIN_GROUP}
+      SPASHIP_AUTH__LDAP__USER_GROUP: ${API_AUTH_USER_GROUP}
+
+
   - kind: ConfigMap
     apiVersion: v1
     metadata:
@@ -224,7 +255,7 @@ objects:
               imagePullPolicy: Always
               ports:
                 - name: http
-                  containerPort: 3000
+                  containerPort: 2345
                   protocol: TCP
               livenessProbe:
                 tcpSocket:
