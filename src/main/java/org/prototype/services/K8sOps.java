@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ApplicationScoped
 public class K8sOps {
@@ -48,15 +50,20 @@ public class K8sOps {
         Map<String, String> envConfig = getEnvironmentConfigData(ConfigProvider.getConfig()
                 .getValue("ops.environment.configmap.name", String.class),namespace);
         LOG.info("env parameters are as follows {}",envConfig);
-        templateParameters.putAll(envConfig);
-        LOG.info("final list of params are as follows {}",templateParameters);
+        Map<String, String> combinedTemplateParams = Stream.of(templateParameters, envConfig)
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue));
+        LOG.info("final list of params are as follows {}",combinedTemplateParams);
+
         var k8sResourceList
                 = openShiftClient
                 .templates()
                 .inNamespace(namespace)
                 .load(K8sOps
                         .class.getResourceAsStream("/openshift/spaship-express-template.yaml"))
-                .processLocally(templateParameters);
+                .processLocally(combinedTemplateParams);
 
 
         k8sResourceList.getItems().forEach(resource -> {
@@ -86,7 +93,7 @@ public class K8sOps {
 
     private Map<String, String> getEnvironmentConfigData(String configMapName,String nameSpace) {
 
-        LOG.info("Looking for configmap {} in namespace {}",configMapName,configMapName);
+        LOG.info("Looking for configmap {} in namespace {}",configMapName,nameSpace);
 
         return Optional.ofNullable(openShiftClient.configMaps().inNamespace(nameSpace).withName(configMapName))
                 .map(configMap->configMap.get().getData())
