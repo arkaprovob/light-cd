@@ -413,6 +413,8 @@ objects:
     data:
       OPERATOR_EVENT_BUS_ADDRESS: spa-ops-event-channel
       OPERATOR_DOMAIN_NAME: ${DOMAIN}
+      APP_INSTANCE: ${APP_INSTANCE}
+
   - kind: Deployment
     apiVersion: apps/v1
     metadata:
