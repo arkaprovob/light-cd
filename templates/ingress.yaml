@@ -3,6 +3,9 @@ kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
   name: ingress-{{ include "light-cd.fullname" . }}
+  labels:
+    app.kubernetes.io/managed-by: helm
+    shard: internal
 spec:
   rules:
     - host: {{ .Values.app.instance }}.{{ .Values.nameOverride }}.{{ .Values.app.domain }}
