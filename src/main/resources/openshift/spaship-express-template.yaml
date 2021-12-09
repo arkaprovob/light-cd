@@ -473,7 +473,8 @@ objects:
     metadata:
       name: ing-${APP_INSTANCE}-operator
       labels:
-        app.kubernetes.io/managed-by: spaship
+        app.kubernetes.io/managed-by: light-cd
+        shard: internal
     spec:
       rules:
         - host: ${APP_INSTANCE}.operator.${DOMAIN}
@@ -491,7 +492,8 @@ objects:
     metadata:
       name: ing-${APP_INSTANCE}-api
       labels:
-        app.kubernetes.io/managed-by: spaship
+        app.kubernetes.io/managed-by: light-cd
+        shard: internal
     spec:
       rules:
         - host: ${APP_INSTANCE}.api.${DOMAIN}
@@ -509,7 +511,8 @@ objects:
     metadata:
       name: ing-${APP_INSTANCE}-manager
       labels:
-        app.kubernetes.io/managed-by: spaship
+        app.kubernetes.io/managed-by: light-cd
+        shard: internal
     spec:
       rules:
         - host: ${APP_INSTANCE}.manager.${DOMAIN}
