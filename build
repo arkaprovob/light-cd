@@ -1,14 +1,19 @@
 #!/bin/sh
 
-# build distribution
-mvn -B package --file pom.xml
+read -p "update existing image? " build
 
-# create docker image, tag the image and push it into dev repo
-docker build -t light-cd -f src/main/docker/Dockerfile.jvm .
-docker tag light-cd quay.io/arbhatta/light-cd:master
-echo $quay_password | docker login quay.io --username $quay_user --password-stdin
-docker push quay.io/arbhatta/light-cd:master
+if [ -z "$build" ]; then
+  printf "skipped build and proceeding with the deployment only"
+else
+  # build distribution
+  mvn -B package --file pom.xml
 
+  # create docker image, tag the image and push it into dev repo
+  docker build -t light-cd -f src/main/docker/Dockerfile.jvm .
+  docker tag light-cd quay.io/arbhatta/light-cd:master
+  echo $quay_password | docker login quay.io --username $quay_user --password-stdin
+  docker push quay.io/arbhatta/light-cd:master
+fi
 # get the user input of application domain for supporting ingress controller
 read -p "Enter app domain: " domain
 
@@ -22,6 +27,6 @@ else
    prefixUrl="http://spaship-manager-arbhatta-dev."
    apiContextPath="/api/v1"
    fullPath="${prefixUrl}${domain}${apiContextPath}"
-   echo "helm install --set image.repository=quay.io/arbhatta/light-cd --set image.tag=master --set app.namespace=light-cd --set app.environment=* --set app.storageclass=local-path --set app.apiurl=$fullPath --set app.uimemory=1024Mi --set app.domain=$domain light-cd ."
-   helm install --set image.repository=quay.io/arbhatta/light-cd --set image.tag=master --set app.namespace=light-cd --set app.environment=* --set app.storageclass=local-path --set app.apiurl=$fullPath --set app.uimemory=1024Mi --set app.domain=$domain light-cd .
+   echo "helm install --set image.repository=quay.io/arbhatta/light-cd --set image.tag=master --set app.namespace=light-cd --set app.environment=* --set app.storageclass=local-path --set app.uimemory=1024Mi --set app.domain=$domain --set app.instance="local" light-cd ."
+   helm install --set image.repository=quay.io/arbhatta/light-cd --set image.tag=master --set app.namespace=light-cd --set app.environment=* --set app.storageclass=local-path --set app.uimemory=1024Mi --set app.domain=$domain --set app.instance="local" light-cd .
 fi
