@@ -150,6 +150,8 @@ objects:
         - metadata:
             annotations:
               kubernetes.io/reclaimPolicy: Delete
+            labels:
+              paas.redhat.com/appcode: SPAS-001
             name: mongo-volume
           spec:
             accessModes: [ "ReadWriteOnce" ]
