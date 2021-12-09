@@ -81,7 +81,7 @@ objects:
       labels:
         app.kubernetes.io/name: mongo
         app.kubernetes.io/instance: mongo
-        app.kubernetes.io/managed-by: spaship
+        app.kubernetes.io/managed-by: light-cd
     spec:
       ports:
         - protocol: TCP
@@ -90,26 +90,26 @@ objects:
       clusterIP: None
       selector:
         app: mongo
-        app.kubernetes.io/managed-by: spaship
+        app.kubernetes.io/managed-by: light-cd
   - kind: StatefulSet
     apiVersion: apps/v1
     metadata:
       name: mongo
       labels:
         app: mongo
-        app.kubernetes.io/managed-by: spaship
+        app.kubernetes.io/managed-by: light-cd
     spec:
       replicas: 1
       selector:
         matchLabels:
           app: mongo
-          app.kubernetes.io/managed-by: spaship
+          app.kubernetes.io/managed-by: light-cd
       serviceName: mongo
       template:
         metadata:
           labels:
             app: mongo
-            app.kubernetes.io/managed-by: spaship
+            app.kubernetes.io/managed-by: light-cd
         spec:
           terminationGracePeriodSeconds: 30
           imagePullSecrets:
@@ -148,6 +148,8 @@ objects:
 #                  value: "app=mongo,app.kubernetes.io/managed-by=spaship"
       volumeClaimTemplates:
         - metadata:
+            annotations:
+              kubernetes.io/reclaimPolicy: Delete
             name: mongo-volume
           spec:
             accessModes: [ "ReadWriteOnce" ]
