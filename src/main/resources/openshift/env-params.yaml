@@ -1,0 +1,18 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: api-config
+  labels:
+    app.kubernetes.io/instance: api
+    app.kubernetes.io/managed-by: spaship
+    app.kubernetes.io/name: api
+    app.kubernetes.io/version: 1.0.0
+data:
+  SPASHIP_AUTH__KEYCLOAK__CLIENTID: "<client id>"
+  SPASHIP_AUTH__KEYCLOAK__ID_PROP: "<your-enc-specific-value>"
+  SPASHIP_AUTH__KEYCLOAK__PUBKEY: "<your-enc-specific-value>"
+  SPASHIP_AUTH__KEYCLOAK__REALM: "<your-enc-specific-value>"
+  SPASHIP_AUTH__KEYCLOAK__URL: "<your-enc-specific-value>"
+  SPASHIP_AUTH__LDAP__ADMIN_GROUP: "<your-enc-specific-value>"
+  SPASHIP_AUTH__LDAP__USER_GROUP: "<your-enc-specific-value>"
+  SPASHIP_DB__MONGO__URL: "<your-enc-specific-value>"
