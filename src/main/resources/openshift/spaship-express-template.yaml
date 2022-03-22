@@ -130,17 +130,17 @@ objects:
                 - "--replSet"
                 - rs0
               ports:
-                - name: spaship-mongo-port
+                - name: mongo-port
                   containerPort: 27017
                   protocol: TCP
               livenessProbe:
                 tcpSocket:
-                  port: spaship-mongo-port
+                  port: mongo-port
                 initialDelaySeconds: 5
                 periodSeconds: 10
               readinessProbe:
                 tcpSocket:
-                  port: spaship-mongo-port
+                  port: mongo-port
                 initialDelaySeconds: 15
                 periodSeconds: 20
               volumeMounts:
