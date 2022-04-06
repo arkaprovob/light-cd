@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    app.openshift.io/connects-to: {{ .Values.ocVisualConnectorannotation }}
   name: light-cd
   labels:
     app.kubernetes.io/name: light-cd

@@ -4,6 +4,8 @@
 
 replicaCount: 1
 
+ocVisualConnectorannotation: [{"apiVersion":"apps/v1","kind":"Deployment","name":"api"},{"apiVersion":"apps/v1","kind":"Deployment","name":"operator"},{"apiVersion":"apps/v1","kind":"Deployment","name":"spaship-ui"},{"apiVersion":"apps/v1","kind":"StatefulSet","name":"mongo"}]
+
 image:
   repository: quay.io/arbhatta/light-cd
   pullPolicy: Always
