@@ -97,6 +97,88 @@ objects:
       selector:
         app: spaship-mongo
         app.kubernetes.io/managed-by: light-cd
+
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: spaship-api-service
+      labels:
+        app.kubernetes.io/name: spaship-api
+        app.kubernetes.io/instance: spaship-api
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    spec:
+      type: ClusterIP
+      clusterIP: None
+      ports:
+        - port: 3000
+          targetPort: http
+          protocol: TCP
+          name: http
+      selector:
+        app.kubernetes.io/name: spaship-api
+        app.kubernetes.io/instance: spaship-api
+
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: operator-service
+      labels:
+        app.kubernetes.io/name: operator
+        app.kubernetes.io/instance: operator
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    spec:
+      type: ClusterIP
+      clusterIP: None
+      ports:
+        - port: 8080
+          targetPort: http
+          protocol: TCP
+          name: http
+      selector:
+        app.kubernetes.io/name: operator
+        app.kubernetes.io/instance: operator
+
+
+  - kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: spaship-api-config
+      labels:
+        app.kubernetes.io/name: spaship-api
+        app.kubernetes.io/instance: spaship-api
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    data:
+      SPASHIP_DB__MONGO__URL: spaship-mongo-0.spaship-mongo:27017
+      SPASHIP_AUTH__KEYCLOAK__CLIENTID: ${KEYCLOAK_CLIENTID}
+      SPASHIP_AUTH__KEYCLOAK__ID_PROP: ${KEYCLOAK_ID_PROP}
+      SPASHIP_AUTH__KEYCLOAK__PUBKEY: ${KEYCLOAK_PUBKEY}
+      SPASHIP_AUTH__KEYCLOAK__REALM: ${KEYCLOAK_REALM}
+      SPASHIP_AUTH__KEYCLOAK__URL: ${KEYCLOAK_URL}
+      SPASHIP_AUTH__LDAP__ADMIN_GROUP: ${API_AUTH_ADMIN_GROUP}
+      SPASHIP_AUTH__LDAP__USER_GROUP: ${API_AUTH_USER_GROUP}
+      OPERATOR_BASEPATH: "http://operator-service:8080"
+      TOKEN_SECRET: ${API_JWT_SECRET}
+      TOKEN_EXPIRATION: ${API_JWT_EXPIRY}
+      ORCHESTRATOR_BASEPATH: http://${APP_INSTANCE}.api.${DOMAIN}
+
+  - kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: operator-config
+      labels:
+        app.kubernetes.io/name: operator
+        app.kubernetes.io/instance: operator
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    data:
+      OPERATOR_EVENT_BUS_ADDRESS: spa-ops-event-channel
+      OPERATOR_DOMAIN_NAME: ${DOMAIN}
+      APP_INSTANCE: ${APP_INSTANCE}
+      STORAGE_CLASS: ${STORAGE_CLASS}
+
   - kind: StatefulSet
     apiVersion: apps/v1
     metadata:
@@ -104,6 +186,8 @@ objects:
       labels:
         app: spaship-mongo
         app.kubernetes.io/managed-by: light-cd
+        app.openshift.io/runtime: mongodb
+        app.kubernetes.io/part-of: spaship
     spec:
       replicas: 1
       selector:
@@ -146,12 +230,6 @@ objects:
               volumeMounts:
                 - name: mongo-volume
                   mountPath: /data/db
-#            - name: mongo-sidecar
-#              image: cvallance/mongo-k8s-sidecar
-#              imagePullPolicy: IfNotPresent
-#              env:
-#                - name: MONGO_SIDECAR_POD_LABELS
-#                  value: "app=mongo,app.kubernetes.io/managed-by=spaship"
       volumeClaimTemplates:
         - metadata:
             annotations:
@@ -166,61 +244,20 @@ objects:
               requests:
                 storage: 2Gi
 
-
-
-  - kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: spaship-api-config
-      labels:
-        app.kubernetes.io/name: spaship-api
-        app.kubernetes.io/instance: spaship-api
-        app.kubernetes.io/version: 1.0.0
-        app.kubernetes.io/managed-by: spaship
-    data:
-      SPASHIP_DB__MONGO__URL: spaship-mongo-0.spaship-mongo:27017
-      SPASHIP_AUTH__KEYCLOAK__CLIENTID: ${KEYCLOAK_CLIENTID}
-      SPASHIP_AUTH__KEYCLOAK__ID_PROP: ${KEYCLOAK_ID_PROP}
-      SPASHIP_AUTH__KEYCLOAK__PUBKEY: ${KEYCLOAK_PUBKEY}
-      SPASHIP_AUTH__KEYCLOAK__REALM: ${KEYCLOAK_REALM}
-      SPASHIP_AUTH__KEYCLOAK__URL: ${KEYCLOAK_URL}
-      SPASHIP_AUTH__LDAP__ADMIN_GROUP: ${API_AUTH_ADMIN_GROUP}
-      SPASHIP_AUTH__LDAP__USER_GROUP: ${API_AUTH_USER_GROUP}
-      OPERATOR_BASEPATH: "http://operator-service:8080"
-      TOKEN_SECRET: ${API_JWT_SECRET}
-      TOKEN_EXPIRATION: ${API_JWT_EXPIRY}
-      ORCHESTRATOR_BASEPATH: http://${APP_INSTANCE}.api.${DOMAIN}
-
-
-  - kind: Service
-    apiVersion: v1
-    metadata:
-      name: spaship-api-service
-      labels:
-        app.kubernetes.io/name: spaship-api
-        app.kubernetes.io/instance: spaship-api
-        app.kubernetes.io/version: 1.0.0
-        app.kubernetes.io/managed-by: spaship
-    spec:
-      type: ClusterIP
-      clusterIP: None
-      ports:
-        - port: 3000
-          targetPort: http
-          protocol: TCP
-          name: http
-      selector:
-        app.kubernetes.io/name: spaship-api
-        app.kubernetes.io/instance: spaship-api
   - kind: Deployment
     apiVersion: apps/v1
     metadata:
       name: spaship-api
+    annotations:
+      app.openshift.io/connects-to: >-
+        [{"apiVersion":"apps/v1","kind":"StatefulSet","name":"spaship-mongo"}]
       labels:
         app.kubernetes.io/name: spaship-api
         app.kubernetes.io/instance: spaship-api
         app.kubernetes.io/version: 1.0.0
         app.kubernetes.io/managed-by: spaship
+        app.openshift.io/runtime: nodejs
+        app.kubernetes.io/part-of: spaship
     spec:
       selector:
         matchLabels:
@@ -266,70 +303,6 @@ objects:
               imagePullPolicy: IfNotPresent
               command: [ 'sh','-c','until nslookup spaship-mongo; do echo waiting for keycloak; sleep 2; done;' ]
 
-  - kind: HorizontalPodAutoscaler
-    apiVersion: autoscaling/v2beta1
-    metadata:
-      name: spaship-api
-      labels:
-        app.kubernetes.io/name: spaship-api
-        app.kubernetes.io/instance: spaship-api
-        app.kubernetes.io/version: 1.0.0
-        app.kubernetes.io/managed-by: spaship
-    spec:
-      scaleTargetRef:
-        apiVersion: apps/v1
-        kind: Deployment
-        name: spaship-api
-      minReplicas: 1
-      maxReplicas: 1
-      metrics:
-        - type: Resource
-          resource:
-            name: cpu
-            targetAverageUtilization: 80
-        - type: Resource
-          resource:
-            name: memory
-            targetAverageUtilization: 80
-
-
-
-
-  - kind: Service
-    apiVersion: v1
-    metadata:
-      name: operator-service
-      labels:
-        app.kubernetes.io/name: operator
-        app.kubernetes.io/instance: operator
-        app.kubernetes.io/version: 1.0.0
-        app.kubernetes.io/managed-by: spaship
-    spec:
-      type: ClusterIP
-      clusterIP: None
-      ports:
-        - port: 8080
-          targetPort: http
-          protocol: TCP
-          name: http
-      selector:
-        app.kubernetes.io/name: operator
-        app.kubernetes.io/instance: operator
-  - kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: operator-config
-      labels:
-        app.kubernetes.io/name: operator
-        app.kubernetes.io/instance: operator
-        app.kubernetes.io/version: 1.0.0
-        app.kubernetes.io/managed-by: spaship
-    data:
-      OPERATOR_EVENT_BUS_ADDRESS: spa-ops-event-channel
-      OPERATOR_DOMAIN_NAME: ${DOMAIN}
-      APP_INSTANCE: ${APP_INSTANCE}
-      STORAGE_CLASS: ${STORAGE_CLASS}
-
   - kind: Deployment
     apiVersion: apps/v1
     metadata:
@@ -339,6 +312,8 @@ objects:
         app.kubernetes.io/instance: operator
         app.kubernetes.io/version: 1.0.0
         app.kubernetes.io/managed-by: spaship
+        app.openshift.io/runtime: operator
+        app.kubernetes.io/part-of: spaship
     spec:
       selector:
         matchLabels:
@@ -383,6 +358,32 @@ objects:
                 requests:
                   cpu: 300m
                   memory: 256Mi
+
+  - kind: HorizontalPodAutoscaler
+    apiVersion: autoscaling/v2beta1
+    metadata:
+      name: spaship-api
+      labels:
+        app.kubernetes.io/name: spaship-api
+        app.kubernetes.io/instance: spaship-api
+        app.kubernetes.io/version: 1.0.0
+        app.kubernetes.io/managed-by: spaship
+    spec:
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: spaship-api
+      minReplicas: 1
+      maxReplicas: 1
+      metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            targetAverageUtilization: 80
+        - type: Resource
+          resource:
+            name: memory
+            targetAverageUtilization: 80
   - kind: Ingress
     apiVersion: networking.k8s.io/v1
     metadata:

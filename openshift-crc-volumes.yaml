@@ -1,0 +1,103 @@
+# get nodeAffinity.required.nodeSelectorTerms.matchExpressions.values from https://console-openshift-console.apps-crc.testing/k8s/cluster/nodes/
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-volume
+spec:
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: gp2
+  local:
+    path: /home/arkaprovo/host/mnt/cass-operator/pvx
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - crc-jw57j-master-0
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: gp-storage-0
+spec:
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: gp2
+  local:
+    path: /home/arkaprovo/host/mnt/cass-operator/pv000
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - crc-jw57j-master-0
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: gp-storage-1
+spec:
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: gp2
+  local:
+    path: /home/arkaprovo/host/mnt/cass-operator/pv001
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - crc-jw57j-master-0
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: gp-storage-2
+spec:
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: gp2
+  local:
+    path: /home/arkaprovo/host/mnt/cass-operator/pv002
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - crc-jw57j-master-0
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: gp2
+provisioner: kubernetes.io/no-provisioner
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
