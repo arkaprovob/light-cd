@@ -78,3 +78,22 @@ Persistent Volumes are to be created with affinity to the master node, declared 
 
 Goto openshift-crc-volumes.yaml and there change the `nodeAffinity.required.nodeSelectorTerms.matchExpressions.values` as per your cluster name
 execute `oc create -f openshift-crc-volumes.yaml`
+
+### Enable https for ingress route
+Generate a ssl certificate create a kube secret out of it, setup and configure `tls` section in ingress route as given in the `ingress.yaml` template.
+I have used the following commands to generate the certificate and created kube secret out of it.
+```
+mkdir ~/temp_tls_dir
+cd ~/temp_tls_dir
+openssl genrsa -out ca.key 2048
+openssl req -x509 \
+  -new -nodes  \
+  -days 365 \
+  -key ca.key \
+  -out ca.crt \
+  -subj "/CN=router-default.apps-crc.testing"
+kubectl create secret tls my-tls-secret \
+--key ca.key \
+--cert ca.crt
+
+```

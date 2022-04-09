@@ -3,15 +3,22 @@ kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
   name: ingress-{{ include "light-cd.fullname" . }}
+#  annotations:
+#    haproxy.router.openshift.io/rewrite-target: /
   labels:
     app.kubernetes.io/managed-by: helm
     shard: internal
 spec:
+  tls:
+    - hosts:
+        - {{ .Values.app.instance }}.{{ .Values.nameOverride }}.{{ .Values.app.domain }}
+      secretName: my-tls-secret
+
   rules:
     - host: {{ .Values.app.instance }}.{{ .Values.nameOverride }}.{{ .Values.app.domain }}
       http:
         paths:
-          - path: /
+          - path: / #unblock annotations if path is anything other than / for example /test
             pathType: Prefix
             backend:
               service:
