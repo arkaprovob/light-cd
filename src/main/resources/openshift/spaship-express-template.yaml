@@ -248,9 +248,6 @@ objects:
     apiVersion: apps/v1
     metadata:
       name: spaship-api
-    annotations:
-      app.openshift.io/connects-to: >-
-        [{"apiVersion":"apps/v1","kind":"StatefulSet","name":"spaship-mongo"}]
       labels:
         app.kubernetes.io/name: spaship-api
         app.kubernetes.io/instance: spaship-api
@@ -258,6 +255,9 @@ objects:
         app.kubernetes.io/managed-by: spaship
         app.openshift.io/runtime: nodejs
         app.kubernetes.io/part-of: spaship
+      annotations:
+        app.openshift.io/connects-to: >-
+          [{"apiVersion":"apps/v1","kind":"StatefulSet","name":"spaship-mongo"}]
     spec:
       selector:
         matchLabels:
