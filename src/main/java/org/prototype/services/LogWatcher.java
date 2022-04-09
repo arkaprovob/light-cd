@@ -28,9 +28,9 @@ public class LogWatcher {
         LOG.debug("namespace {}, podName {}, lines {}", nameSpace, podName, tailingLines);
 
         return Uni.createFrom().item(() -> openShiftClient.pods()
-                .inNamespace(nameSpace).withName(podName)
-                .tailingLines(tailingLines).withPrettyOutput()
-                .getLog(true))
+                        .inNamespace(nameSpace).withName(podName)
+                        .tailingLines(tailingLines).withPrettyOutput()
+                        .getLog(true))
                 .runSubscriptionOn(Infrastructure.getDefaultExecutor())
                 .onFailure()
                 .recoverWithItem(Throwable::getLocalizedMessage);

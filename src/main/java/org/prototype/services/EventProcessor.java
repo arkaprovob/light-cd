@@ -33,14 +33,14 @@ public class EventProcessor {
         Uni.createFrom().item(payload)
                 .emitOn(Infrastructure.getDefaultExecutor())
                 .map(this::buildTemplateParameters)
-                .map(item-> k8sOps.businessLogic(item,payload.getName(),namespace))
+                .map(item -> k8sOps.businessLogic(item, payload.getName(), namespace))
                 .subscribe()
                 .with(consumer -> LOG.info("deployment success status {}", consumer));
     }
 
 
-    private Map<String, String> buildTemplateParameters(Payload payload){
-        if(Objects.isNull(payload))
+    private Map<String, String> buildTemplateParameters(Payload payload) {
+        if (Objects.isNull(payload))
             throw new CheckedException("payload not found!");
         var nameInCaps = payload.getName().toUpperCase();
         var tagNameAttribute = "TAG".concat("_").concat(nameInCaps);
@@ -54,14 +54,12 @@ public class EventProcessor {
                 "UI_MEMORY_LIMIT", ConfigProvider.getConfig()
                         .getValue("template.ui.memory.limit", String.class),
                 "DOMAIN", ConfigProvider.getConfig().getValue("template.domain", String.class),
-                tagNameAttribute,payload.getUpdatedTags().get(0),
-                repoAttribute,payload.getDockerUrl(),
-                "APP_INSTANCE",ConfigProvider.getConfig()
+                tagNameAttribute, payload.getUpdatedTags().get(0),
+                repoAttribute, payload.getDockerUrl(),
+                "APP_INSTANCE", ConfigProvider.getConfig()
                         .getValue("app.instance", String.class)
         );
     }
-
-
 
 
 }

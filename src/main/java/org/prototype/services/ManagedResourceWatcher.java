@@ -5,7 +5,6 @@ import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
 import io.fabric8.kubernetes.client.dsl.ExecListener;
-import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
@@ -17,10 +16,8 @@ import javax.enterprise.context.ApplicationScoped;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 @ApplicationScoped
 //todo check why is not it working
@@ -30,7 +27,7 @@ public class ManagedResourceWatcher {
     private static final Logger LOG = LoggerFactory.getLogger(ManagedResourceWatcher.class);
     private static final String CONTAINER_NAME = "mongo";
     private final OpenShiftClient openShiftClient;
-    private Watch watch=null;
+    private Watch watch = null;
 
 
     public ManagedResourceWatcher(OpenShiftClient openShiftClient) {
@@ -41,7 +38,7 @@ public class ManagedResourceWatcher {
 
         String lastMongoPodName = "mongo-".concat(noOfPods);
         LOG.info("lastMongoPodName {}", lastMongoPodName);
-        if(Objects.nonNull(watch)){
+        if (Objects.nonNull(watch)) {
             LOG.warn("watcher already exists closing it to start a new");
             watch.close();
             watch = null;
@@ -81,16 +78,16 @@ public class ManagedResourceWatcher {
                 .nullItem()
                 .emitOn(Infrastructure.getDefaultExecutor())
                 .onItem().delayIt().by(Duration.ofMillis(3000))
-                .map(ocClient-> {
+                .map(ocClient -> {
                     var mongoContainerCount = openShiftClient.pods().inNamespace(nameSpace).withName(podName)
                             .get().getSpec().getContainers().stream()
                             .filter(container -> container.getName().equalsIgnoreCase(CONTAINER_NAME))
                             .count();
-                    return mongoContainerCount >0;
-                }).map(container-> {
-                    if(Boolean.FALSE.equals(container)){
+                    return mongoContainerCount > 0;
+                }).map(container -> {
+                    if (Boolean.FALSE.equals(container)) {
                         return "container doesn't exists hence skipping rs.initiate() exec operation";
-                    }else{
+                    } else {
                         LOG.debug("Initiating rsinit for pod {}", podName);
                         openShiftClient
                                 .pods()
@@ -102,11 +99,8 @@ public class ManagedResourceWatcher {
                                 .usingListener(execListener()).exec("mongo", "--eval", "'rs.initiate()'").close();
                         return "rs.initiate() invoked on pod".concat(podName);
                     }
-        }).subscribe()
-                .with(LOG::info, failure->LOG.error("failed to execute rs.initiate() due to {} ",failure.getMessage()));
-
-
-
+                }).subscribe()
+                .with(LOG::info, failure -> LOG.error("failed to execute rs.initiate() due to {} ", failure.getMessage()));
 
 
     }

@@ -12,7 +12,6 @@ import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
 import org.eclipse.microprofile.config.ConfigProvider;
-import org.prototype.type.Payload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,24 +37,22 @@ public class K8sOps {
     }
 
 
-
-
-    public boolean businessLogic(Map<String, String> templateParameters,String selectedResourceName,String namespace) {
+    public boolean businessLogic(Map<String, String> templateParameters, String selectedResourceName, String namespace) {
 
         var success = false;
 
         LOG.info("templateParameters are as follows {} and selectedResourceName is {}",
-                templateParameters,selectedResourceName);
+                templateParameters, selectedResourceName);
 
         Map<String, String> envConfig = getEnvironmentConfigData(ConfigProvider.getConfig()
-                .getValue("ops.environment.configmap.name", String.class),namespace);
-        LOG.info("env parameters are as follows {}",envConfig);
+                .getValue("ops.environment.configmap.name", String.class), namespace);
+        LOG.info("env parameters are as follows {}", envConfig);
         Map<String, String> combinedTemplateParams = Stream.of(templateParameters, envConfig)
                 .flatMap(map -> map.entrySet().stream())
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue));
-        LOG.info("final list of params are as follows {}",combinedTemplateParams);
+        LOG.info("final list of params are as follows {}", combinedTemplateParams);
 
         var k8sResourceList
                 = openShiftClient
@@ -70,7 +67,7 @@ public class K8sOps {
 
             var resourceName = resource.getMetadata().getName();
 
-            LOG.info("resource type is {}",resource.getKind());
+            LOG.info("resource type is {}", resource.getKind());
 
             if (resource instanceof StatefulSet)
                 handleStatefulSet(namespace, (StatefulSet) resource, resourceName);
@@ -91,12 +88,12 @@ public class K8sOps {
         return success;
     }
 
-    private Map<String, String> getEnvironmentConfigData(String configMapName,String nameSpace) {
+    private Map<String, String> getEnvironmentConfigData(String configMapName, String nameSpace) {
 
-        LOG.info("Looking for configmap {} in namespace {}",configMapName,nameSpace);
+        LOG.info("Looking for configmap {} in namespace {}", configMapName, nameSpace);
 
         return Optional.ofNullable(openShiftClient.configMaps().inNamespace(nameSpace).withName(configMapName))
-                .map(configMap->configMap.get().getData())
+                .map(configMap -> configMap.get().getData())
                 .orElse(Collections.emptyMap());
 
     }
@@ -111,32 +108,32 @@ public class K8sOps {
         Uni.createFrom()
                 .item(() -> {
                     boolean dDStatus = Optional.ofNullable(
-                            openShiftClient.apps().deployments().inNamespace(nameSpace).withLabels(labelFilter))
+                                    openShiftClient.apps().deployments().inNamespace(nameSpace).withLabels(labelFilter))
                             .map(Deletable::delete)
                             .orElse(false);
 
                     boolean ssDStatus = Optional.ofNullable(
-                            openShiftClient.apps().statefulSets().inNamespace(nameSpace).withLabels(labelFilter))
+                                    openShiftClient.apps().statefulSets().inNamespace(nameSpace).withLabels(labelFilter))
                             .map(Deletable::delete)
                             .orElse(false);
 
                     boolean hpaDStatus = Optional.ofNullable(
-                            openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers().inNamespace(nameSpace).withLabels(labelFilter))
+                                    openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers().inNamespace(nameSpace).withLabels(labelFilter))
                             .map(Deletable::delete)
                             .orElse(false);
 
                     boolean svcDStatus = Optional.ofNullable(
-                            openShiftClient.services().inNamespace(nameSpace).withLabels(labelFilter))
+                                    openShiftClient.services().inNamespace(nameSpace).withLabels(labelFilter))
                             .map(Deletable::delete)
                             .orElse(false);
 
                     boolean cmDStatus = Optional.ofNullable(
-                            openShiftClient.configMaps().inNamespace(nameSpace).withLabels(labelFilter))
+                                    openShiftClient.configMaps().inNamespace(nameSpace).withLabels(labelFilter))
                             .map(Deletable::delete)
                             .orElse(false);
 
                     boolean icDStatus = Optional.ofNullable(
-                            openShiftClient.network().v1().ingresses().inNamespace(nameSpace).withLabels(labelFilter))
+                                    openShiftClient.network().v1().ingresses().inNamespace(nameSpace).withLabels(labelFilter))
                             .map(Deletable::delete)
                             .orElse(false);
                     return (dDStatus && ssDStatus && hpaDStatus && svcDStatus && cmDStatus && icDStatus);
@@ -221,7 +218,6 @@ public class K8sOps {
             LOG.info("Ingress {} created successfully ", resourceName);
         }
     }
-
 
 
 }

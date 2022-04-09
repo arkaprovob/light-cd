@@ -29,7 +29,7 @@ public class Deployment {
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
     public String deploy(Payload payload) {
-        LOG.debug("incoming payload is {}",payload);
+        LOG.debug("incoming payload is {}", payload);
         validateIncomingEvent(payload);
         payload.setK8sNameSpace(nameSpace);
         bus.send("process.deployment", payload);
@@ -43,7 +43,7 @@ public class Deployment {
         return "accepted";
     }
 
-    void validateIncomingEvent(Payload payload){
+    void validateIncomingEvent(Payload payload) {
         if (!tag.equals("*") && !payload.tagExists(tag)) {
             LOG.info("validation trigger condition not met");
             throw new CheckedException("incoming event is not a part of this instance");

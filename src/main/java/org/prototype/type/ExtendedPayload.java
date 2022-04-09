@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class ExtendedPayload {
     Payload payload;
-    Map<String,String> templateParameters;
+    Map<String, String> templateParameters;
 
     public Payload getPayload() {
         return payload;
