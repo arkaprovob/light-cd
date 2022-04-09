@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @ApplicationScoped
+//todo check why is not it working
 public class ManagedResourceWatcher {
 
 
