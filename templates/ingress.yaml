@@ -12,7 +12,7 @@ spec:
   tls:
     - hosts:
         - {{ .Values.app.instance }}.{{ .Values.nameOverride }}.{{ .Values.app.domain }}
-      secretName: my-tls-secret
+      secretName: spaship-ingress-tls-secret
 
   rules:
     - host: {{ .Values.app.instance }}.{{ .Values.nameOverride }}.{{ .Values.app.domain }}

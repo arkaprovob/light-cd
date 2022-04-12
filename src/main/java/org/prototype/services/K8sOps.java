@@ -103,7 +103,7 @@ public class K8sOps {
     void cleanupResources(String nameSpace) {
 
         LOG.info("cleaning all resources from  {}", nameSpace);
-        var labelFilter = Map.of("app.kubernetes.io/managed-by", "spaship");
+        var labelFilter = Map.of("app.kubernetes.io/managed-by", "light-cd");
 
         Uni.createFrom()
                 .item(() -> {
