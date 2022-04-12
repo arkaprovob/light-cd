@@ -532,6 +532,10 @@ objects:
       annotations:
         haproxy.router.openshift.io/timeout: 600s
     spec:
+      tls:
+        - hosts:
+            - ${APP_INSTANCE}.spaship.${DOMAIN}
+          secretName: spaship-ingress-tls-secret
       rules:
         - host: ${APP_INSTANCE}.spaship.${DOMAIN}
           http:
