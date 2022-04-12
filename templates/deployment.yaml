@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   annotations:
     app.openshift.io/connects-to: >-
-      [{"apiVersion":"apps/v1","kind":"Deployment","name":"operator"},{"apiVersion":"apps/v1","kind":"Deployment","name":"spaship-api"},{"apiVersion":"apps/v1","kind":"StatefulSet","name":"spaship-mongo"}]
+      [{"apiVersion":"apps/v1","kind":"Deployment","name":"spaship-manager"},{"apiVersion":"apps/v1","kind":"Deployment","name":"operator"},{"apiVersion":"apps/v1","kind":"Deployment","name":"spaship-api"},{"apiVersion":"apps/v1","kind":"StatefulSet","name":"spaship-mongo"}]
   name: light-cd
   labels:
     app.kubernetes.io/name: light-cd
