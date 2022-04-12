@@ -505,6 +505,9 @@ objects:
       labels:
         app.kubernetes.io/managed-by: light-cd
         shard: internal
+      annotations:
+        haproxy.router.openshift.io/timeout: 600s
+
     spec:
       rules:
         - host: ${APP_INSTANCE}.operator.${DOMAIN}
@@ -526,6 +529,8 @@ objects:
       labels:
         app.kubernetes.io/managed-by: light-cd
         shard: internal
+      annotations:
+        haproxy.router.openshift.io/timeout: 600s
     spec:
       rules:
         - host: ${APP_INSTANCE}.spaship.${DOMAIN}

@@ -3,11 +3,12 @@ kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
   name: ingress-{{ include "light-cd.fullname" . }}
-#  annotations:
-#    haproxy.router.openshift.io/rewrite-target: /
   labels:
     app.kubernetes.io/managed-by: helm
     shard: internal
+  annotations:
+    haproxy.router.openshift.io/timeout: 600s
+    #haproxy.router.openshift.io/rewrite-target: /
 spec:
   tls:
     - hosts:
