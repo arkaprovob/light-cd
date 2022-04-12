@@ -96,7 +96,7 @@ objects:
       clusterIP: None
       selector:
         app: spaship-mongo
-        app.kubernetes.io/managed-by: light-cd
+        app.kubernetes.io/managed-by: self
 
   - kind: Service
     apiVersion: v1
@@ -420,7 +420,7 @@ objects:
         app.kubernetes.io/instance: spaship-manager
         app.kubernetes.io/version: 1.0.0
         app.kubernetes.io/managed-by: light-cd
-        app.openshift.io/runtime: react
+        app.openshift.io/runtime: js
         app.kubernetes.io/part-of: spaship
       annotations:
         app.openshift.io/connects-to: >-
