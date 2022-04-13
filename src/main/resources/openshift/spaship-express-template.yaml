@@ -470,31 +470,7 @@ objects:
 
 
 
-  - kind: HorizontalPodAutoscaler
-    apiVersion: autoscaling/v2beta1
-    metadata:
-      name: spaship-api
-      labels:
-        app.kubernetes.io/name: spaship-api
-        app.kubernetes.io/instance: spaship-api
-        app.kubernetes.io/version: 1.0.0
-        app.kubernetes.io/managed-by: light-cd
-    spec:
-      scaleTargetRef:
-        apiVersion: apps/v1
-        kind: Deployment
-        name: spaship-api
-      minReplicas: 1
-      maxReplicas: 1
-      metrics:
-        - type: Resource
-          resource:
-            name: cpu
-            targetAverageUtilization: 80
-        - type: Resource
-          resource:
-            name: memory
-            targetAverageUtilization: 80
+
 
 
 
