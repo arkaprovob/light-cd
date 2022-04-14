@@ -78,7 +78,7 @@ public class K8sOps {
             if (resource instanceof Service)
                 handleService(namespace, (Service) resource, resourceName);
             if (resource instanceof HorizontalPodAutoscaler)
-                handleHPA(namespace, (HorizontalPodAutoscaler) resource, resourceName);
+                handleHPA(selectedResourceName,namespace, (HorizontalPodAutoscaler) resource, resourceName);
             if (resource instanceof Ingress)
                 handleIngress(namespace, (Ingress) resource, resourceName);
 
@@ -144,13 +144,19 @@ public class K8sOps {
 
     }
 
-    private void handleHPA(String namespace, HorizontalPodAutoscaler resource, String resourceName) {
+    private void handleHPA(String selectedResourceName,String namespace, HorizontalPodAutoscaler resource, String resourceName) {
         LOG.debug("dealing with the HorizontalPodAutoscaler");
         HorizontalPodAutoscaler hpaInK8s = openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers().inNamespace(namespace).withName(resourceName).get();
         if (Objects.isNull(hpaInK8s)) {
             LOG.debug("HorizontalPodAutoscaler {} doesn't exist creating new ", resourceName);
             openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers().inNamespace(namespace).createOrReplace(resource);
             LOG.info("HPA {} created successfully ", resourceName);
+        }else if (selectedResourceName.equalsIgnoreCase(resourceName)) {
+            LOG.info("HPA {} exists and needs to update", resourceName);
+            openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers().inNamespace(namespace).withName(resourceName).delete();
+            LOG.info("deleted HPA {}", resourceName);
+            openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers().inNamespace(namespace).createOrReplace(resource);
+            LOG.info("re-created HPA {}", resourceName);
         }
     }
 
