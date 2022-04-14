@@ -184,13 +184,13 @@ public class K8sOps {
         LOG.debug("dealing with the Deployment, payload name attribute {}, resource {}", selectedResourceName, resourceName);
         var deploymentInK8s = openShiftClient.apps().deployments().inNamespace(namespace).withName(resourceName).get();
         if (Objects.isNull(deploymentInK8s)) {
-            LOG.debug("Deployment {} doesn't exist creating new ", resourceName);
+            LOG.info("Deployment {} doesn't exist creating new ", resourceName);
             openShiftClient.apps().deployments().inNamespace(namespace).createOrReplace(resource);
             LOG.info("Deployment {} created successfully ", resourceName);
         } else if (selectedResourceName.equalsIgnoreCase(resourceName)) {
-            LOG.debug("Deployment {} exists and need to update", resourceName);
+            LOG.info("Deployment {} exists and need to update", resourceName);
             openShiftClient.apps().deployments().inNamespace(namespace).withName(resourceName).delete();
-            LOG.debug("deleted deployment {}", resourceName);
+            LOG.info("deleted deployment {}", resourceName);
             openShiftClient.apps().deployments().inNamespace(namespace).createOrReplace(resource);
             openShiftClient.apps().deployments().inNamespace(namespace).withName(resource.getMetadata().getName()).rolling();
             LOG.info("re-created deployment {}", resourceName);
