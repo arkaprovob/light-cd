@@ -90,3 +90,4 @@ app:
   storageclass: gp2
   uimemory: 512Mi
   domain: na
+  users: johndoe,janedoe

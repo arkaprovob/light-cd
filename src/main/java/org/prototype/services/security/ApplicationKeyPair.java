@@ -34,7 +34,7 @@ public class ApplicationKeyPair {
                 java.security.KeyPairGenerator.getInstance("RSA");
         SecureRandom secureRandom = new SecureRandom();
         keyPairGenerator.initialize(ConfigProvider.getConfig()
-                .getValue("apps.security.keySize", Integer.class),secureRandom);
+                .getValue("app.security.keysize", Integer.class),secureRandom);
 
         KeyPair pair = keyPairGenerator.generateKeyPair();
 

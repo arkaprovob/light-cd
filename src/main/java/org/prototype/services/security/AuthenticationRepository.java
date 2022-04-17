@@ -32,7 +32,7 @@ public class AuthenticationRepository {
         Objects.requireNonNull(privateKey,"error during AuthenticationRepository initialization privateKey " +
                 "is null");
         var allowedUsers = Arrays.asList(
-                ConfigProvider.getConfig().getValue("apps.security.allowed.users", String[].class)
+                ConfigProvider.getConfig().getValue("app.security.allowed.users", String[].class)
         );
         allowedUsers.forEach(entry-> apiKeys.put(entry,RSA.encryptData(privateKey,entry)));
         apiKeys.forEach((k,v)-> LOG.info("{\"name\":\"{}\", \"apiKey\":\"{}\"}",k,v));

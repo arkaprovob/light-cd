@@ -25,7 +25,7 @@ public class HttpRequestFilter {
         }
         rc.response().putHeader("X-Header", UUID.randomUUID().toString());
         var apiKey = Optional.ofNullable(rc.request().getHeader(
-                ConfigProvider.getConfig().getValue("apps.security.header", String.class)
+                ConfigProvider.getConfig().getValue("app.security.header", String.class)
         )).orElse("NF");
 
 
