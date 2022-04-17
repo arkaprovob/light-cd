@@ -22,7 +22,7 @@ parameters:
     description: "SPAship operator repository"
     value: "quay.io/spaship/operator"
     required: true
-  - name: "TAG_MANAGER"
+  - name: "TAG_SPASHIP-MANAGER"
     description: "tag of the manager ui"
     value: master
     required: true
@@ -438,7 +438,7 @@ objects:
         spec:
           containers:
             - name: spaship-manager
-              image: "${MANAGER_REPOSITORY}:${TAG_MANAGER}"
+              image: "${MANAGER_REPOSITORY}:${TAG_SPASHIP-MANAGER}"
               env:
                 - name: REACT_APP_API_URL
                   value: ${API_URL}

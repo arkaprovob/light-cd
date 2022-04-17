@@ -3,7 +3,9 @@ package org.prototype.services;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentStatus;
 import io.fabric8.kubernetes.api.model.apps.StatefulSet;
+import io.fabric8.kubernetes.api.model.apps.StatefulSetStatus;
 import io.fabric8.kubernetes.api.model.autoscaling.v2beta1.HorizontalPodAutoscaler;
 import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
 import io.fabric8.kubernetes.client.dsl.Deletable;
@@ -12,6 +14,7 @@ import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
 import org.eclipse.microprofile.config.ConfigProvider;
+import org.prototype.services.security.RSA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +40,11 @@ public class K8sOps {
     }
 
 
-    public boolean businessLogic(Map<String, String> templateParameters, String selectedResourceName, String namespace) {
+    public boolean businessLogic(Map<String, String> templateParameters, String selectedResourceName,
+                                 String namespace, String requester) {
 
         var success = false;
+        var requesterName =  RSA.getRequesterNameFromApiKey(requester); //todo
 
         LOG.info("templateParameters are as follows {} and selectedResourceName is {}",
                 templateParameters, selectedResourceName);
@@ -70,9 +75,9 @@ public class K8sOps {
             LOG.info("resource type is {}", resource.getKind());
 
             if (resource instanceof StatefulSet)
-                handleStatefulSet(namespace, (StatefulSet) resource, resourceName);
+                handleStatefulSet(namespace, (StatefulSet) resource, resourceName, requesterName);
             if (resource instanceof Deployment)
-                handleDeployment(selectedResourceName, namespace, (Deployment) resource, resourceName);
+                handleDeployment(selectedResourceName, namespace, (Deployment) resource, resourceName,requesterName);
             if (resource instanceof ConfigMap)
                 handleConfigMap(selectedResourceName, namespace, (ConfigMap) resource, resourceName);
             if (resource instanceof Service)
@@ -186,9 +191,13 @@ public class K8sOps {
         }
     }
 
-    private void handleDeployment(String selectedResourceName, String namespace, Deployment resource, String resourceName) {
+    private void handleDeployment(String selectedResourceName, String namespace, Deployment resource, String resourceName,String requester) {
         LOG.debug("dealing with the Deployment, payload name attribute {}, resource {}", selectedResourceName, resourceName);
         var deploymentInK8s = openShiftClient.apps().deployments().inNamespace(namespace).withName(resourceName).get();
+        var status = new DeploymentStatus();
+        status.setAdditionalProperty("executedBy",requester);
+        resource.setStatus(status);
+
         if (Objects.isNull(deploymentInK8s)) {
             LOG.info("Deployment {} doesn't exist creating new ", resourceName);
             openShiftClient.apps().deployments().inNamespace(namespace).createOrReplace(resource);
@@ -203,12 +212,16 @@ public class K8sOps {
         }
     }
 
-    private void handleStatefulSet(String namespace, StatefulSet resource, String resourceName) {
+    private void handleStatefulSet(String namespace, StatefulSet resource, String resourceName, String requester) {
         LOG.debug("dealing with the stateful set");
         var statefulSetInK8s = openShiftClient.apps().statefulSets().inNamespace(namespace).withName(resourceName).get();
         if (Objects.isNull(statefulSetInK8s)) {
             LOG.debug("StatefulSet {} doesn't exist creating new ", resourceName);
+            var status = new StatefulSetStatus();
+            status.setAdditionalProperty("executedBy",requester);
+            resource.setStatus(status);
             var statefulSet = openShiftClient.apps().statefulSets().inNamespace(namespace).createOrReplace(resource);
+
             LOG.info("StatefulSet {} created successfully ", resourceName);
             String noOfReplica = Integer.toString(statefulSet.getSpec().getReplicas() - 1);
             managedResourceWatcher.initiatePodWatcher(namespace, Map.of("app", "mongo"), noOfReplica);

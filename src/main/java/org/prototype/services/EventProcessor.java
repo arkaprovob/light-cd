@@ -33,7 +33,7 @@ public class EventProcessor {
         Uni.createFrom().item(payload)
                 .emitOn(Infrastructure.getDefaultExecutor())
                 .map(this::buildTemplateParameters)
-                .map(item -> k8sOps.businessLogic(item, payload.getName(), namespace))
+                .map(item -> k8sOps.businessLogic(item, payload.getName(), namespace,payload.getRequester()))
                 .subscribe()
                 .with(consumer -> LOG.info("deployment success status {}", consumer));
     }
@@ -46,7 +46,7 @@ public class EventProcessor {
         var tagNameAttribute = "TAG".concat("_").concat(nameInCaps);
         var repoAttribute = nameInCaps.concat("_REPOSITORY");
 
-        return Map.of("TAG", payload.getUpdatedTags().get(0),
+        var output= Map.of("TAG", payload.getUpdatedTags().get(0),
                 "STORAGE_CLASS", ConfigProvider.getConfig()
                         .getValue("template.storage.param.value", String.class),
                 "API_URL", ConfigProvider.getConfig()
@@ -59,6 +59,8 @@ public class EventProcessor {
                 "APP_INSTANCE", ConfigProvider.getConfig()
                         .getValue("app.instance", String.class)
         );
+        LOG.info("buildTemplateParameters output is {}",output);
+        return  output;
     }
 
 

@@ -28,10 +28,11 @@ public class Deployment {
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
-    public String deploy(Payload payload) {
+    public String deploy(Payload payload,@HeaderParam("auth") String requester) {
         LOG.debug("incoming payload is {}", payload);
         validateIncomingEvent(payload);
         payload.setK8sNameSpace(nameSpace);
+        payload.setRequester(requester);
         bus.send("process.deployment", payload);
         return "accepted";
     }

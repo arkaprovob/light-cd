@@ -15,6 +15,7 @@ public class Payload {
     @JsonProperty("updated_tags")
     List<String> updatedTags;
     String k8sNameSpace;
+    String requester;
 
 
     public String getName() {
@@ -75,6 +76,14 @@ public class Payload {
 
     public void setK8sNameSpace(String k8sNameSpace) {
         this.k8sNameSpace = k8sNameSpace;
+    }
+
+    public String getRequester() {
+        return requester;
+    }
+
+    public void setRequester(String requester) {
+        this.requester = requester;
     }
 
     @Override
