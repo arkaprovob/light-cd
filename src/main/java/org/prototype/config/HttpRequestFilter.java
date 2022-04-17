@@ -24,11 +24,11 @@ public class HttpRequestFilter {
     void authFilter(RoutingContext rc) {
 
 
-/*        if(rc.request().absoluteURI().contains("health")){
+        if(rc.request().absoluteURI().contains("health")){
             rc.response().putHeader("X-Header", "free hit");
             rc.next();
             return;
-        }*/
+        }
         rc.response().putHeader("X-Header", UUID.randomUUID().toString());
         var apiKey = rc.request().getHeader(
                 ConfigProvider.getConfig().getValue("apps.security.header", String.class)
