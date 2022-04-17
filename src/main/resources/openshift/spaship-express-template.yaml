@@ -10,7 +10,7 @@ parameters:
     description: "SPAship orchestrator repository"
     value: "quay.io/spaship/api"
     required: true
-  - name: "TAG_API"
+  - name: "TAG_SPASHIP-API"
     description: "tag of the api"
     value: master
     required: true
@@ -322,7 +322,7 @@ objects:
         spec:
           containers:
             - name: api
-              image: "${API_REPOSITORY}:${TAG_API}"
+              image: "${API_REPOSITORY}:${TAG_SPASHIP-API}"
               envFrom:
                 - configMapRef:
                     name: spaship-api-config
