@@ -10,6 +10,6 @@ data:
   TEMPLATE_UI_MEMORY_LIMIT: {{ .Values.app.uimemory }}
   TEMPLATE_DOMAIN: {{ .Values.app.domain }}
   APP_INSTANCE: {{ .Values.app.instance }}
-  APP_SECURITY_ALLOWED_USERS: {{ .Values.app.users }}
+  APP_SECURITY_ALLOWED_USERS: "{{ .Values.app.users }}"
   APP_SECURITY_HEADER: "apiKey"
   APP_SECURITY_KEYSIZE: "512"
