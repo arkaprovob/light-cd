@@ -59,7 +59,7 @@ public class EventProcessor {
                 "APP_INSTANCE", ConfigProvider.getConfig()
                         .getValue("app.instance", String.class)
         );
-        LOG.info("buildTemplateParameters output is {}", output);
+        LOG.debug("buildTemplateParameters output is {}", output);
         return output;
     }
 

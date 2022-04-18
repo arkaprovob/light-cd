@@ -485,7 +485,7 @@ objects:
         kind: Deployment
         name: spaship-api
       minReplicas: 1
-      maxReplicas: 1
+      maxReplicas: 2
       metrics:
         - type: Resource
           resource:

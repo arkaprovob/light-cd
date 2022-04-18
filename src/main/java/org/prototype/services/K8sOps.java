@@ -193,10 +193,11 @@ public class K8sOps {
 
     private void handleDeployment(String selectedResourceName, String namespace, Deployment resource, String resourceName, String requester) {
         LOG.debug("dealing with the Deployment, payload name attribute {}, resource {}", selectedResourceName, resourceName);
+        LOG.info("operation triggered by {}",requester);
         var deploymentInK8s = openShiftClient.apps().deployments().inNamespace(namespace).withName(resourceName).get();
-        var status = new DeploymentStatus();
-        status.setAdditionalProperty("executedBy", requester);
-        resource.setStatus(status);
+        //var status = new DeploymentStatus();
+        //status.setAdditionalProperty("executedBy", requester);
+        //resource.setStatus(status);
 
         if (Objects.isNull(deploymentInK8s)) {
             LOG.info("Deployment {} doesn't exist creating new ", resourceName);
@@ -205,7 +206,7 @@ public class K8sOps {
         } else if (selectedResourceName.equalsIgnoreCase(resourceName)) {
             LOG.info("Deployment {} exists and need to update", resourceName);
             openShiftClient.apps().deployments().inNamespace(namespace).withName(resourceName).delete();
-            LOG.info("deleted deployment {}", resourceName);
+            LOG.debug("deleted deployment {}", resourceName);
             openShiftClient.apps().deployments().inNamespace(namespace).createOrReplace(resource);
             openShiftClient.apps().deployments().inNamespace(namespace).withName(resource.getMetadata().getName()).rolling();
             LOG.info("re-created deployment {}", resourceName);
@@ -214,12 +215,13 @@ public class K8sOps {
 
     private void handleStatefulSet(String namespace, StatefulSet resource, String resourceName, String requester) {
         LOG.debug("dealing with the stateful set");
+        LOG.info("operation triggered by {}",requester);
         var statefulSetInK8s = openShiftClient.apps().statefulSets().inNamespace(namespace).withName(resourceName).get();
         if (Objects.isNull(statefulSetInK8s)) {
             LOG.debug("StatefulSet {} doesn't exist creating new ", resourceName);
-            var status = new StatefulSetStatus();
-            status.setAdditionalProperty("executedBy", requester);
-            resource.setStatus(status);
+            //var status = new StatefulSetStatus();
+            //status.setAdditionalProperty("executedBy", requester);
+            //resource.setStatus(status);
             var statefulSet = openShiftClient.apps().statefulSets().inNamespace(namespace).createOrReplace(resource);
 
             LOG.info("StatefulSet {} created successfully ", resourceName);
