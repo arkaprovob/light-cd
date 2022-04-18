@@ -6,7 +6,7 @@ data:
   APPLICATION_K8S_NAMESPACE: {{ .Values.app.namespace }}
   VALIDATION_TRIGGER_TAG: {{ .Values.app.environment | squote  }}
   TEMPLATE_STORAGE_PARAM_VALUE: {{ .Values.app.storageclass }}
-  TEMPLATE_API_URL_PARAM_VALUE: {{ .Values.app.instance }}.spaship.api.{{ .Values.app.domain }}/api/v1
+  TEMPLATE_API_URL_PARAM_VALUE: http://{{ .Values.app.instance }}.spaship.api.{{ .Values.app.domain }}/api/v1
   TEMPLATE_UI_MEMORY_LIMIT: {{ .Values.app.uimemory }}
   TEMPLATE_DOMAIN: {{ .Values.app.domain }}
   APP_INSTANCE: {{ .Values.app.instance }}
