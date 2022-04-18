@@ -10,7 +10,7 @@ parameters:
     description: "SPAship orchestrator repository"
     value: "quay.io/spaship/api"
     required: true
-  - name: "TAG_SPASHIP-API"
+  - name: "TAG_API"
     description: "tag of the api"
     value: master
     required: true
@@ -22,7 +22,7 @@ parameters:
     description: "SPAship operator repository"
     value: "quay.io/spaship/operator"
     required: true
-  - name: "TAG_SPASHIP-MANAGER"
+  - name: "TAG_MANAGER"
     description: "tag of the manager ui"
     value: master
     required: true
@@ -78,6 +78,16 @@ parameters:
   - name: "API_JWT_EXPIRY"
     description: "JWT expiry time"
     required: true
+  - name: "API_AUTH_TOKEN"
+    description: "spaship api auth token"
+    required: true
+  - name: "SPASHIP_AUTH__GITHUB_ID"
+    description: "Github id for manager oauth integration"
+    required: true
+  - name: "SPASHIP_AUTH__GITHUB_SECRET"
+    description: "Github secret for manager oauth integration"
+    required: true
+
 
 objects:
   - kind: Service
@@ -215,18 +225,13 @@ objects:
         app.kubernetes.io/version: 1.0.0
         app.kubernetes.io/managed-by: light-cd
     data:
-      REACT_APP_API_URL: ${API_URL}
-      SPASHIP_AUTH__GITHUB_ID: ""
-      SPASHIP_AUTH__GITHUB_SECRET: ""
-      SPASHIP_AUTH__GITLAB_CLIENT_ID: ""
-      SPASHIP_AUTH__GITLAB_CLIENT_SECRET: ""
-      SPASHIP_AUTH__GOOGLE_CLIENT_ID: ""
-      SPASHIP_AUTH__GOOGLE_CLIENT_SECRET: ""
+      SPASHIP_API_BASE_URL: ${API_URL}
       SPASHIP_AUTH__KEYCLOAK_ID: ${KEYCLOAK_CLIENTID}
       SPASHIP_AUTH__KEYCLOAK_SECRET: ""
       SPASHIP_AUTH__KEYCLOAK_ISSUER: ""
-      SPASHIP_API_HOST: ${API_URL}
-      SPASHIP_AUTH_TOKEN: ""
+      SPASHIP_API_AUTH_TOKEN: ${API_AUTH_TOKEN}
+      SPASHIP_AUTH__GITHUB_ID: ${SPASHIP_AUTH__GITHUB_ID}
+      SPASHIP_AUTH__GITHUB_SECRET: ${SPASHIP_AUTH__GITHUB_SECRET}
 
 
 
@@ -322,7 +327,7 @@ objects:
         spec:
           containers:
             - name: api
-              image: "${API_REPOSITORY}:${TAG_SPASHIP-API}"
+              image: "${API_REPOSITORY}:${TAG_API}"
               envFrom:
                 - configMapRef:
                     name: spaship-api-config
@@ -438,7 +443,7 @@ objects:
         spec:
           containers:
             - name: spaship-manager
-              image: "${MANAGER_REPOSITORY}:${TAG_SPASHIP-MANAGER}"
+              image: "${MANAGER_REPOSITORY}:${TAG_MANAGER}"
               env:
                 - name: REACT_APP_API_URL
                   value: ${API_URL}

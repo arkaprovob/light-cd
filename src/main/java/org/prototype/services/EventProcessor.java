@@ -33,9 +33,19 @@ public class EventProcessor {
         Uni.createFrom().item(payload)
                 .emitOn(Infrastructure.getDefaultExecutor())
                 .map(this::buildTemplateParameters)
-                .map(item -> k8sOps.businessLogic(item, payload.getName(), namespace, payload.getRequester()))
+                .map(item -> k8sOps.businessLogic(item, transformResourceName(payload.getName()), namespace, payload.getRequester()))
                 .subscribe()
                 .with(consumer -> LOG.info("deployment success status {}", consumer));
+    }
+
+    private String transformResourceName(String resourceName){
+        var appPrefix = ConfigProvider.getConfig()
+                .getValue("app.name.prefix", String.class);
+        if(resourceName.contains(appPrefix))
+            return resourceName;
+        var output = appPrefix.concat("-").concat(resourceName);
+        LOG.info("transformed resource name is {}",output);
+        return output;
     }
 
 

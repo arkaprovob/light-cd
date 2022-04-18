@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/name: api
     app.kubernetes.io/version: 1.0.0
 data:
+  API_AUTH_ADMIN_GROUP: "<Admin group>"
   SPASHIP_AUTH__KEYCLOAK__CLIENTID: "<client id>"
   SPASHIP_AUTH__KEYCLOAK__ID_PROP: "<your-enc-specific-value>"
   SPASHIP_AUTH__KEYCLOAK__PUBKEY: "<your-enc-specific-value>"
