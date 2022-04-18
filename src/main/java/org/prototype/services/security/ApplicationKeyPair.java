@@ -6,7 +6,6 @@ import org.eclipse.microprofile.config.ConfigProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.security.*;
 import java.util.Base64;
 
@@ -16,15 +15,13 @@ public class ApplicationKeyPair {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationKeyPair.class);
 
-    private   PrivateKey privateKey;
-    private   PublicKey publicKey;
+    private PrivateKey privateKey;
+    private PublicKey publicKey;
 
 
-
-    public ApplicationKeyPair(){
+    public ApplicationKeyPair() {
         onStart();
     }
-
 
 
     @SneakyThrows
@@ -34,14 +31,14 @@ public class ApplicationKeyPair {
                 java.security.KeyPairGenerator.getInstance("RSA");
         SecureRandom secureRandom = new SecureRandom();
         keyPairGenerator.initialize(ConfigProvider.getConfig()
-                .getValue("app.security.keysize", Integer.class),secureRandom);
+                .getValue("app.security.keysize", Integer.class), secureRandom);
 
         KeyPair pair = keyPairGenerator.generateKeyPair();
 
         this.privateKey = pair.getPrivate();
         this.publicKey = pair.getPublic();
 
-        LOG.info("generated application key pair is as follows {}",this);
+        LOG.info("generated application key pair is as follows {}", this);
 
     }
 

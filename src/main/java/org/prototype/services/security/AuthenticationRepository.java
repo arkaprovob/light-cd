@@ -5,15 +5,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.PublicKey;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class AuthenticationRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationRepository.class);
-
-    private final Map<String,String> apiKeys;
-    private final ApplicationKeyPair applicationKeyPair;
     static PublicKey publicKey;
+    private final Map<String, String> apiKeys;
+    private final ApplicationKeyPair applicationKeyPair;
 
 
     public AuthenticationRepository() {
@@ -27,18 +29,18 @@ public class AuthenticationRepository {
         AuthenticationRepository.publicKey = input;
     }
 
-    public void initAuthRepo(){
+    public void initAuthRepo() {
         var privateKey = applicationKeyPair.getPrivateKey();
-        Objects.requireNonNull(privateKey,"error during AuthenticationRepository initialization privateKey " +
+        Objects.requireNonNull(privateKey, "error during AuthenticationRepository initialization privateKey " +
                 "is null");
         var allowedUsers = Arrays.asList(
                 ConfigProvider.getConfig().getValue("app.security.allowed.users", String[].class)
         );
-        allowedUsers.forEach(entry-> apiKeys.put(entry,RSA.encryptData(privateKey,entry)));
-        apiKeys.forEach((k,v)-> LOG.info("{\"name\":\"{}\", \"apiKey\":\"{}\"}",k,v));
+        allowedUsers.forEach(entry -> apiKeys.put(entry, RSA.encryptData(privateKey, entry)));
+        apiKeys.forEach((k, v) -> LOG.info("{\"name\":\"{}\", \"apiKey\":\"{}\"}", k, v));
     }
 
-    public Map<String,String> getApiKeys() {
+    public Map<String, String> getApiKeys() {
         return apiKeys;
     }
 }

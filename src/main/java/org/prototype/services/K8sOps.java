@@ -44,7 +44,7 @@ public class K8sOps {
                                  String namespace, String requester) {
 
         var success = false;
-        var requesterName =  RSA.getRequesterNameFromApiKey(requester); //todo
+        var requesterName = RSA.getRequesterNameFromApiKey(requester); //todo
 
         LOG.info("templateParameters are as follows {} and selectedResourceName is {}",
                 templateParameters, selectedResourceName);
@@ -77,13 +77,13 @@ public class K8sOps {
             if (resource instanceof StatefulSet)
                 handleStatefulSet(namespace, (StatefulSet) resource, resourceName, requesterName);
             if (resource instanceof Deployment)
-                handleDeployment(selectedResourceName, namespace, (Deployment) resource, resourceName,requesterName);
+                handleDeployment(selectedResourceName, namespace, (Deployment) resource, resourceName, requesterName);
             if (resource instanceof ConfigMap)
                 handleConfigMap(selectedResourceName, namespace, (ConfigMap) resource, resourceName);
             if (resource instanceof Service)
                 handleService(namespace, (Service) resource, resourceName);
             if (resource instanceof HorizontalPodAutoscaler)
-                handleHPA(selectedResourceName,namespace, (HorizontalPodAutoscaler) resource, resourceName);
+                handleHPA(selectedResourceName, namespace, (HorizontalPodAutoscaler) resource, resourceName);
             if (resource instanceof Ingress)
                 handleIngress(namespace, (Ingress) resource, resourceName);
 
@@ -149,14 +149,14 @@ public class K8sOps {
 
     }
 
-    private void handleHPA(String selectedResourceName,String namespace, HorizontalPodAutoscaler resource, String resourceName) {
+    private void handleHPA(String selectedResourceName, String namespace, HorizontalPodAutoscaler resource, String resourceName) {
         LOG.debug("dealing with the HorizontalPodAutoscaler");
         HorizontalPodAutoscaler hpaInK8s = openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers().inNamespace(namespace).withName(resourceName).get();
         if (Objects.isNull(hpaInK8s)) {
             LOG.debug("HorizontalPodAutoscaler {} doesn't exist creating new ", resourceName);
             openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers().inNamespace(namespace).createOrReplace(resource);
             LOG.info("HPA {} created successfully ", resourceName);
-        }else if (selectedResourceName.equalsIgnoreCase(resourceName)) {
+        } else if (selectedResourceName.equalsIgnoreCase(resourceName)) {
             LOG.info("HPA {} exists and needs to update", resourceName);
             openShiftClient.autoscaling().v2beta1().horizontalPodAutoscalers().inNamespace(namespace).withName(resourceName).delete();
             LOG.info("deleted HPA {}", resourceName);
@@ -191,11 +191,11 @@ public class K8sOps {
         }
     }
 
-    private void handleDeployment(String selectedResourceName, String namespace, Deployment resource, String resourceName,String requester) {
+    private void handleDeployment(String selectedResourceName, String namespace, Deployment resource, String resourceName, String requester) {
         LOG.debug("dealing with the Deployment, payload name attribute {}, resource {}", selectedResourceName, resourceName);
         var deploymentInK8s = openShiftClient.apps().deployments().inNamespace(namespace).withName(resourceName).get();
         var status = new DeploymentStatus();
-        status.setAdditionalProperty("executedBy",requester);
+        status.setAdditionalProperty("executedBy", requester);
         resource.setStatus(status);
 
         if (Objects.isNull(deploymentInK8s)) {
@@ -218,7 +218,7 @@ public class K8sOps {
         if (Objects.isNull(statefulSetInK8s)) {
             LOG.debug("StatefulSet {} doesn't exist creating new ", resourceName);
             var status = new StatefulSetStatus();
-            status.setAdditionalProperty("executedBy",requester);
+            status.setAdditionalProperty("executedBy", requester);
             resource.setStatus(status);
             var statefulSet = openShiftClient.apps().statefulSets().inNamespace(namespace).createOrReplace(resource);
 

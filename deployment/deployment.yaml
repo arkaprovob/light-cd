@@ -21,11 +21,11 @@ spec:
     spec:
       serviceAccountName: light-cd
       securityContext:
-        {}
+        { }
       containers:
         - name: light-cd
           securityContext:
-            {}
+            { }
           image: "quay.io/arbhatta/light-cd:master"
           imagePullPolicy: IfNotPresent
           livenessProbe:

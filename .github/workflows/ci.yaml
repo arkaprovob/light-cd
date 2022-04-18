@@ -8,10 +8,10 @@ on:
       - 'test'
       - 'qa'
       - 'hpa-bug-fix'
-#    tags:
-#      - '*'
-#    paths:
-#      - '*'
+  #    tags:
+  #      - '*'
+  #    paths:
+  #      - '*'
   pull_request:
 
 jobs:
@@ -37,8 +37,8 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-#      - name: Build Naive
-#        run: ./mvnw package -Pnative
+      #      - name: Build Naive
+      #        run: ./mvnw package -Pnative
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x

@@ -16,7 +16,7 @@ public class DeploymentTest {
                 .when().get("/health")
                 .then()
                 .statusCode(200)
-                .body(is(new JsonObject().put("status","up").encodePrettily()));
+                .body(is(new JsonObject().put("status", "up").encodePrettily()));
     }
 
 }

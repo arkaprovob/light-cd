@@ -8,7 +8,7 @@ public class UtilTest {
 
 
     @Test
-    public void checkStringContains(){
+    public void checkStringContains() {
 
         String resourceName = "spaship-ui-config";
         boolean result = resourceName.contains("spaship-ui");

@@ -378,11 +378,11 @@ objects:
         spec:
           serviceAccountName: light-cd
           securityContext:
-            {}
+            { }
           containers:
             - name: operator
               securityContext:
-                {}
+                { }
               image: "${OPERATOR_REPOSITORY}:${TAG_OPERATOR}"
               envFrom:
                 - configMapRef:

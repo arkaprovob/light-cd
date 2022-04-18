@@ -10,6 +10,6 @@ spec:
   containers:
     - name: wget
       image: busybox
-      command: ['wget']
-      args: ['{{ include "light-cd.fullname" . }}:{{ .Values.service.port }}']
+      command: [ 'wget' ]
+      args: [ '{{ include "light-cd.fullname" . }}:{{ .Values.service.port }}' ]
   restartPolicy: Never
