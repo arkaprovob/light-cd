@@ -1,5 +1,7 @@
 package org.prototype.services.security;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +31,7 @@ public class AuthenticationRepository {
         AuthenticationRepository.publicKey = input;
     }
 
-    public void initAuthRepo() {
+    public void initAuthRepo(){
         var privateKey = applicationKeyPair.getPrivateKey();
         Objects.requireNonNull(privateKey, "error during AuthenticationRepository initialization privateKey " +
                 "is null");
@@ -37,7 +39,19 @@ public class AuthenticationRepository {
                 ConfigProvider.getConfig().getValue("app.security.allowed.users", String[].class)
         );
         allowedUsers.forEach(entry -> apiKeys.put(entry, RSA.encryptData(privateKey, entry)));
-        apiKeys.forEach((k, v) -> LOG.info("{\"name\":\"{}\", \"apiKey\":\"{}\"}", k, v));
+
+        apiKeys.put("privateKey",applicationKeyPair.getStringPrivateKey());
+        apiKeys.put("publicKey",applicationKeyPair.getStringPublicKey());
+
+        String credentials = null;
+        try {
+            credentials = new ObjectMapper().writeValueAsString(apiKeys);
+        } catch (JsonProcessingException e) {
+            LOG.info("failed to convert write apiKeys to json {}",e.getMessage());
+        }
+        LOG.info("\n");
+        LOG.info("credentials are as follows {}",credentials);
+        LOG.info("\n");
     }
 
     public Map<String, String> getApiKeys() {

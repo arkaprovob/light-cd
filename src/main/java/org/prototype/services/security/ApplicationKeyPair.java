@@ -38,8 +38,6 @@ public class ApplicationKeyPair {
         this.privateKey = pair.getPrivate();
         this.publicKey = pair.getPublic();
 
-        LOG.info("generated application key pair is as follows {}", this);
-
     }
 
 
@@ -58,6 +56,17 @@ public class ApplicationKeyPair {
     public void setPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;
     }
+
+
+    public String getStringPublicKey() {
+        return Base64.getEncoder().encodeToString(publicKey.getEncoded());
+    }
+    public String getStringPrivateKey() {
+        return Base64.getEncoder().encodeToString(privateKey.getEncoded());
+    }
+
+
+
 
     @Override
     public String toString() {
