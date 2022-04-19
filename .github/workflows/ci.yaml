@@ -8,6 +8,7 @@ on:
       - 'test'
       - 'qa'
       - 'hpa-bug-fix'
+      - 'muti-tenancy'
   #    tags:
   #      - '*'
   #    paths:
