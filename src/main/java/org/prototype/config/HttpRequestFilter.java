@@ -21,8 +21,9 @@ public class HttpRequestFilter {
     @RouteFilter
     void authFilter(RoutingContext rc) {
 
-        var isAuthEnabled = ConfigProvider.getConfig().getValue("app.auth.enabled", Boolean.class);
-        if(Boolean.FALSE.equals(isAuthEnabled)){
+        var isAuthEnabled = ConfigProvider.getConfig().getValue("app.auth.enabled", String.class);
+        var boolIsAuthEnabled = isAuthEnabled.contains("true");
+        if(Boolean.FALSE.equals(boolIsAuthEnabled)){
             LOG.info("authentication disabled");
             rc.response().putHeader(XHEADER, "free hit");
             rc.next();
