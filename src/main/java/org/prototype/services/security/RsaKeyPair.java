@@ -10,16 +10,16 @@ import java.security.*;
 import java.util.Base64;
 
 
-public class ApplicationKeyPair {
+public class RsaKeyPair {
 
 
-    private static final Logger LOG = LoggerFactory.getLogger(ApplicationKeyPair.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RsaKeyPair.class);
 
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
 
-    public ApplicationKeyPair() {
+    public RsaKeyPair() {
         onStart();
     }
 
@@ -37,7 +37,7 @@ public class ApplicationKeyPair {
 
         this.privateKey = pair.getPrivate();
         this.publicKey = pair.getPublic();
-
+        LOG.info("RsaKeyPair generated");
     }
 
 

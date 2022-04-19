@@ -3,9 +3,7 @@ package org.prototype.services;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.api.model.apps.DeploymentStatus;
 import io.fabric8.kubernetes.api.model.apps.StatefulSet;
-import io.fabric8.kubernetes.api.model.apps.StatefulSetStatus;
 import io.fabric8.kubernetes.api.model.autoscaling.v2beta1.HorizontalPodAutoscaler;
 import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
 import io.fabric8.kubernetes.client.dsl.Deletable;
@@ -14,7 +12,7 @@ import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
 import org.eclipse.microprofile.config.ConfigProvider;
-import org.prototype.services.security.RSA;
+import org.prototype.services.security.RSAUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,10 +39,10 @@ public class K8sOps {
 
 
     public boolean businessLogic(Map<String, String> templateParameters, String selectedResourceName,
-                                 String namespace, String requester) {
+                                 String namespace, String encryptedRequester) {
 
         var success = false;
-        var requesterName = RSA.getRequesterNameFromApiKey(requester); //todo
+        var requesterName = RSAUtil.deEncrypt(encryptedRequester); //todo
 
         LOG.info("templateParameters are as follows {} and selectedResourceName is {}",
                 templateParameters, selectedResourceName);

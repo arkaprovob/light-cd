@@ -15,17 +15,26 @@ import java.util.UUID;
 public class HttpRequestFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpRequestFilter.class);
-    private static final AuthenticationRepository AUTHENTICATION_REPOSITORY = new AuthenticationRepository();
+    private  final AuthenticationRepository authRepo = AuthenticationRepository.authenticationRepoInstance();
+    private static final String XHEADER = "X-Header";
 
     @RouteFilter
     void authFilter(RoutingContext rc) {
 
-        if (rc.request().absoluteURI().contains("health") || rc.request().path().equals("/")) {
-            rc.response().putHeader("X-Header", "free hit");
+        var isAuthEnabled = ConfigProvider.getConfig().getValue("app.auth.enabled", Boolean.class);
+        if(Boolean.FALSE.equals(isAuthEnabled)){
+            LOG.info("authentication disabled");
+            rc.response().putHeader(XHEADER, "free hit");
             rc.next();
             return;
         }
-        rc.response().putHeader("X-Header", UUID.randomUUID().toString());
+
+        if (rc.request().absoluteURI().contains("health") || rc.request().path().equals("/")) {
+            rc.response().putHeader(XHEADER, "free hit");
+            rc.next();
+            return;
+        }
+        rc.response().putHeader(XHEADER, UUID.randomUUID().toString());
         var apiKey = Optional.ofNullable(rc.request().getHeader(
                 ConfigProvider.getConfig().getValue("app.security.header", String.class)
         )).orElse("NF");
@@ -33,7 +42,7 @@ public class HttpRequestFilter {
 
         rc.request().headers().add("auth", apiKey);
 
-        var apiKeys = new ArrayList<>(AUTHENTICATION_REPOSITORY.getApiKeys().values());
+        var apiKeys = new ArrayList<>(authRepo.getApiKeys().values());
 
 
         LOG.debug("listed api keys are as follows {} ", apiKeys);

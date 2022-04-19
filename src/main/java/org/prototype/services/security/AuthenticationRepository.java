@@ -15,33 +15,52 @@ import java.util.Objects;
 public class AuthenticationRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationRepository.class);
-    static PublicKey publicKey;
+    private PublicKey publicKey;
     private final Map<String, String> apiKeys;
-    private final ApplicationKeyPair applicationKeyPair;
+    private final RsaKeyPair rsaKeyPair;
+    private static AuthenticationRepository authRepoInstance;
 
 
-    public AuthenticationRepository() {
+
+
+
+    private AuthenticationRepository() {
         apiKeys = new HashMap<>();
-        this.applicationKeyPair = new ApplicationKeyPair();
-        setPublicKey(applicationKeyPair.getPublicKey());
+        this.rsaKeyPair = new RsaKeyPair();
+        setPublicKey(rsaKeyPair.getPublicKey());
         initAuthRepo();
     }
 
-    private static void setPublicKey(PublicKey input) {
-        AuthenticationRepository.publicKey = input;
+    private void setPublicKey(PublicKey input) {
+        this.publicKey = input;
+    }
+
+
+    public static AuthenticationRepository authenticationRepoInstance(){
+        LOG.info("auth instance requested");
+        if(Objects.isNull(authRepoInstance)){
+            LOG.info("AuthenticationRepository.authRepoInstance is null hence creating and setting a new object");
+            AuthenticationRepository.authRepoInstance = new AuthenticationRepository();
+        }
+
+        return AuthenticationRepository.authRepoInstance;
+    }
+
+    static PublicKey getPublicKey(){
+        return authenticationRepoInstance().publicKey;
     }
 
     public void initAuthRepo(){
-        var privateKey = applicationKeyPair.getPrivateKey();
+        var privateKey = rsaKeyPair.getPrivateKey();
         Objects.requireNonNull(privateKey, "error during AuthenticationRepository initialization privateKey " +
                 "is null");
         var allowedUsers = Arrays.asList(
                 ConfigProvider.getConfig().getValue("app.security.allowed.users", String[].class)
         );
-        allowedUsers.forEach(entry -> apiKeys.put(entry, RSA.encryptData(privateKey, entry)));
+        allowedUsers.forEach(entry -> apiKeys.put(entry, RSAUtil.encryptData(privateKey, entry)));
 
-        apiKeys.put("privateKey",applicationKeyPair.getStringPrivateKey());
-        apiKeys.put("publicKey",applicationKeyPair.getStringPublicKey());
+        apiKeys.put("privateKey", rsaKeyPair.getStringPrivateKey());
+        apiKeys.put("publicKey", rsaKeyPair.getStringPublicKey());
 
         String credentials = null;
         try {

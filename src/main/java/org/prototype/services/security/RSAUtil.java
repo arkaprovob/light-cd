@@ -14,20 +14,20 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-public class RSA {
+public class RSAUtil {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RSA.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RSAUtil.class);
 
-    private RSA() {
+    private RSAUtil() {
     }
 
-    public static String getRequesterNameFromApiKey(String base64encryptedData) {
+    public static String deEncrypt(String base64encryptedData) {
 
-        return getRequesterNameFromApiKey(AuthenticationRepository.publicKey, base64encryptedData);
+        return deEncrypt(AuthenticationRepository.getPublicKey(), base64encryptedData);
 
     }
 
-    static String getRequesterNameFromApiKey(PublicKey publicKey, String base64encryptedData) {
+    static String deEncrypt(PublicKey publicKey, String base64encryptedData) {
         String deEncryptedData = "John Doe";
         try {
             deEncryptedData = decryptAPIKey(publicKey, base64encryptedData);

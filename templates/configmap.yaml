@@ -13,3 +13,4 @@ data:
   APP_SECURITY_ALLOWED_USERS: "{{ .Values.app.users }}"
   APP_SECURITY_HEADER: "apiKey"
   APP_SECURITY_KEYSIZE: "512"
+  APP_AUTH_ENABLED: {{ .Values.app.auth }}

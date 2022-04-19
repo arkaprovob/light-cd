@@ -91,3 +91,4 @@ app:
   uimemory: 512Mi
   domain: na
   users: johndoe,janedoe
+  auth: true
