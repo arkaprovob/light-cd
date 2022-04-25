@@ -93,8 +93,8 @@ parameters:
   - name: "SPASHIP_AUTH__KEYCLOAK_ISSUER"
     description: "auth keycloak issuer"
     required: true
-  - name: "API_BASE_URL"
-    description: "base api url"
+  - name: "MANAGER_BASE_URL"
+    description: "base url of manager"
     required: true
   - name: "NEXTAUTH_SECRET"
     description: "next auth secret"
@@ -246,7 +246,7 @@ objects:
       SPASHIP_API_AUTH_TOKEN: ${API_AUTH_TOKEN}
       SPASHIP_AUTH__GITHUB_ID: ${SPASHIP_AUTH__GITHUB_ID}
       SPASHIP_AUTH__GITHUB_SECRET: ${SPASHIP_AUTH__GITHUB_SECRET}
-      NEXTAUTH_URL: ${API_BASE_URL}
+      NEXTAUTH_URL: ${MANAGER_BASE_URL}
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       SPASHIP_GUIDE: ${SPASHIP_GUIDE_URL}
 
