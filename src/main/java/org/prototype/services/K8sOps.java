@@ -108,7 +108,7 @@ public class K8sOps {
         cleanupResources(nameSpace,"app.kubernetes.io/managed-by","spaship");
     }
 
-    @ConsumeEvent("process.cleanup")
+
     void cleanupResources(String nameSpace,String key, String value) {
 
         LOG.info("cleaning all resources from  {}", nameSpace);
