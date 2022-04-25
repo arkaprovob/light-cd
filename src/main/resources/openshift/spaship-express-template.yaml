@@ -87,9 +87,6 @@ parameters:
   - name: "SPASHIP_AUTH__GITHUB_SECRET"
     description: "Github secret for manager oauth integration"
     required: true
-  - name: "SPASHIP_AUTH__KEYCLOAK_SECRET"
-    description: "keycloak auth secret"
-    required: true
   - name: "SPASHIP_AUTH__KEYCLOAK_ISSUER"
     description: "auth keycloak issuer"
     required: true
@@ -241,7 +238,7 @@ objects:
     data:
       SPASHIP_API_BASE_URL: ${API_URL}
       SPASHIP_AUTH__KEYCLOAK_ID: ${KEYCLOAK_CLIENTID}
-      SPASHIP_AUTH__KEYCLOAK_SECRET: ${SPASHIP_AUTH__KEYCLOAK_SECRET}
+      SPASHIP_AUTH__KEYCLOAK_SECRET: ${KEYCLOAK_PUBKEY}
       SPASHIP_AUTH__KEYCLOAK_ISSUER: ${SPASHIP_AUTH__KEYCLOAK_ISSUER}
       SPASHIP_API_AUTH_TOKEN: ${API_AUTH_TOKEN}
       SPASHIP_AUTH__GITHUB_ID: ${SPASHIP_AUTH__GITHUB_ID}

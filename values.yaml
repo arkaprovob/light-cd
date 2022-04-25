@@ -92,3 +92,5 @@ app:
   domain: na
   users: johndoe,janedoe
   auth: true
+  publickey: ""
+  privatekey: ""

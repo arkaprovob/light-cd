@@ -14,3 +14,5 @@ data:
   APP_SECURITY_HEADER: "apiKey"
   APP_SECURITY_KEYSIZE: "512"
   APP_AUTH_ENABLED: "{{ .Values.app.auth }}"
+  RSA_PUBLIC_KEY: {{ .Values.app.publickey }}
+  RSA_PRIVATE_KEY: {{ .Values.app.privatekey }}
