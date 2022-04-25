@@ -145,7 +145,11 @@ public class K8sOps {
                                     openShiftClient.network().v1().ingresses().inNamespace(nameSpace).withLabels(labelFilter))
                             .map(Deletable::delete)
                             .orElse(false);
-                    return (dDStatus && ssDStatus && hpaDStatus && svcDStatus && cmDStatus && icDStatus);
+                    boolean pvcDStatus = Optional.ofNullable(
+                                    openShiftClient.persistentVolumeClaims().inNamespace(nameSpace).withLabels(labelFilter))
+                            .map(Deletable::delete)
+                            .orElse(false);
+                    return (dDStatus && ssDStatus && hpaDStatus && svcDStatus && cmDStatus && icDStatus && pvcDStatus);
                 })
                 .runSubscriptionOn(Infrastructure.getDefaultExecutor())
                 .subscribe()
