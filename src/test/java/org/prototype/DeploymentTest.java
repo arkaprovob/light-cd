@@ -1,3 +1,4 @@
+/*
 package org.prototype;
 
 import io.quarkus.test.junit.QuarkusTest;
@@ -10,13 +11,15 @@ import static org.hamcrest.CoreMatchers.is;
 @QuarkusTest
 public class DeploymentTest {
 
-    @Test
+*/
+/*    @Test
     public void testHelloEndpoint() {
         given()
                 .when().get("/health")
                 .then()
                 .statusCode(200)
                 .body(is(new JsonObject().put("status", "up").encodePrettily()));
-    }
+    }*//*
 
-}
+
+}*/
