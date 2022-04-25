@@ -104,9 +104,15 @@ public class K8sOps {
 
     @ConsumeEvent("process.cleanup")
     void cleanupResources(String nameSpace) {
+        cleanupResources(nameSpace,"app.kubernetes.io/managed-by","light-cd");
+        cleanupResources(nameSpace,"app.kubernetes.io/managed-by","spaship");
+    }
+
+    @ConsumeEvent("process.cleanup")
+    void cleanupResources(String nameSpace,String key, String value) {
 
         LOG.info("cleaning all resources from  {}", nameSpace);
-        var labelFilter = Map.of("app.kubernetes.io/managed-by", "light-cd");
+        var labelFilter = Map.of(key, value);
 
         Uni.createFrom()
                 .item(() -> {
