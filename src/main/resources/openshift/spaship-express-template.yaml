@@ -465,6 +465,10 @@ objects:
                 - configMapRef:
                     name: spaship-manager-config
               imagePullPolicy: Always
+              volumeMounts:
+                - name: ca-crt
+                  mountPath: /app/bundle.crt
+                  subPath: bundle.crt
               ports:
                 - name: http
                   containerPort: 2468
@@ -486,7 +490,10 @@ objects:
                 requests:
                   cpu: 300m
                   memory: 256Mi
-
+          volumes:
+            - name: ca-crt
+              configMap:
+                name: redhat-ca-bundle
 
 
   - kind: HorizontalPodAutoscaler
