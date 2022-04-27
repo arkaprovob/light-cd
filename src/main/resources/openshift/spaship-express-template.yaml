@@ -210,7 +210,6 @@ objects:
       TOKEN_SECRET: ${API_JWT_SECRET}
       TOKEN_EXPIRATION: ${API_JWT_EXPIRY}
       ORCHESTRATOR_BASEPATH: http://${APP_INSTANCE}.api.${DOMAIN}
-      NODE_EXTRA_CA_CERTS: /var/run/secrets/redhat-ca-bundle/ca-bundle.crt
 
   - kind: ConfigMap
     apiVersion: v1
@@ -247,6 +246,7 @@ objects:
       NEXTAUTH_URL: ${MANAGER_BASE_URL}
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       SPASHIP_GUIDE: ${SPASHIP_GUIDE_URL}
+      NODE_EXTRA_CA_CERTS: /var/run/secrets/redhat-ca-bundle/ca-bundle.crt #todo make this configurable
 
 
 
