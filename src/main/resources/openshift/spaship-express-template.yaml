@@ -210,6 +210,7 @@ objects:
       TOKEN_SECRET: ${API_JWT_SECRET}
       TOKEN_EXPIRATION: ${API_JWT_EXPIRY}
       ORCHESTRATOR_BASEPATH: http://${APP_INSTANCE}.api.${DOMAIN}
+      NODE_EXTRA_CA_CERTS: /var/run/secrets/redhat-ca-bundle/ca-bundle.crt
 
   - kind: ConfigMap
     apiVersion: v1
@@ -467,8 +468,7 @@ objects:
               imagePullPolicy: Always
               volumeMounts:
                 - name: ca-crt
-                  mountPath: /app/bundle.crt
-                  subPath: bundle.crt
+                  mountPath: /var/run/secrets/redhat-ca-bundle
               ports:
                 - name: http
                   containerPort: 2468
