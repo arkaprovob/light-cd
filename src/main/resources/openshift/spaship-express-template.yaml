@@ -99,6 +99,9 @@ parameters:
   - name: "SPASHIP_GUIDE_URL"
     description: "SPAship guide url"
     required: true
+  - name: "SPASHIP_AUTH__KEYCLOAK_REFRESH_TOKEN_URL"
+    description: "keycloak refresh token url"
+    required: true
 
 objects:
   - kind: Service
@@ -247,6 +250,7 @@ objects:
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       SPASHIP_GUIDE: ${SPASHIP_GUIDE_URL}
       NODE_EXTRA_CA_CERTS: /var/run/secrets/redhat-ca-bundle/ca-bundle.crt #todo make this configurable
+      SPASHIP_AUTH__KEYCLOAK_REFRESH_TOKEN_URL: ${SPASHIP_AUTH__KEYCLOAK_REFRESH_TOKEN_URL}
 
 
 
