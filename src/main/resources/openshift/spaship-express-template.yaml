@@ -102,6 +102,9 @@ parameters:
   - name: "SPASHIP_AUTH__KEYCLOAK_REFRESH_TOKEN_URL"
     description: "keycloak refresh token url"
     required: true
+  - name: "DEFAULT_NS"
+    description: "default namepsace for sapship operator"
+    required: true
 
 objects:
   - kind: Service
@@ -228,6 +231,8 @@ objects:
       OPERATOR_DOMAIN_NAME: ${DOMAIN}
       APP_INSTANCE: ${APP_INSTANCE}
       STORAGE_CLASS: ${STORAGE_CLASS}
+      APPLICATION_WEBPROP_NS_DEFAULT: ${DEFAULT_NS}
+
 
   - kind: ConfigMap
     apiVersion: v1
